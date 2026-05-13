@@ -1,0 +1,329 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+
+import 'home.dart';
+import 'mis_horas.dart';
+import 'perfil.dart';
+
+class RegistrarActividad extends StatefulWidget {
+  final String rol;
+
+  const RegistrarActividad({
+    super.key,
+    required this.rol,
+  });
+
+  @override
+  State<RegistrarActividad> createState() =>
+      _RegistrarActividadState();
+}
+
+class _RegistrarActividadState
+    extends State<RegistrarActividad> {
+
+  File? archivoSeleccionado;
+
+  final TextEditingController comentarioController =
+      TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+
+      backgroundColor: const Color(0xFFF4F6FA),
+
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF2E4A9E),
+        title: const Text("Subir evidencia"),
+      ),
+
+      body: SingleChildScrollView(
+
+        padding: const EdgeInsets.all(20),
+
+        child: Column(
+          children: [
+
+            const SizedBox(height: 20),
+
+            const Text(
+              "Sube evidencia de la actividad realizada",
+
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            TextField(
+
+              controller: comentarioController,
+
+              maxLines: 3,
+
+              decoration: InputDecoration(
+
+                hintText: "Comentario (opcional)",
+
+                filled: true,
+                fillColor: Colors.white,
+
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+
+                  borderSide: const BorderSide(
+                    color: Colors.transparent,
+                  ),
+                ),
+
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+
+                  borderSide: const BorderSide(
+                    color: Color(0xFF2E4A9E),
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            ElevatedButton.icon(
+
+              style: ElevatedButton.styleFrom(
+
+                backgroundColor: Colors.white,
+
+                foregroundColor: const Color(0xFF2E4A9E),
+
+                elevation: 2,
+
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
+
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+
+              onPressed: () {
+
+                setState(() {
+
+                  archivoSeleccionado =
+                      File("evidencia.pdf");
+
+                });
+              },
+
+              icon: const Icon(Icons.attach_file),
+
+              label: const Text(
+
+                "Subir archivo",
+
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            if (archivoSeleccionado != null)
+
+              Container(
+
+                padding: const EdgeInsets.all(14),
+
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+
+                child: Row(
+                  children: [
+
+                    const Icon(
+                      Icons.picture_as_pdf,
+                      color: Colors.red,
+                    ),
+
+                    const SizedBox(width: 10),
+
+                    const Expanded(
+                      child: Text(
+
+                        "Archivo: evidencia.pdf",
+
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+                  ],
+                ),
+              ),
+
+            const SizedBox(height: 35),
+
+            ElevatedButton(
+
+              style: ElevatedButton.styleFrom(
+
+                backgroundColor:
+                    const Color(0xFF2E4A9E),
+
+                foregroundColor:
+                    const Color(0xFFFFC107),
+
+                elevation: 3,
+
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 45,
+                  vertical: 15,
+                ),
+
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+
+              onPressed: () {
+
+                if (archivoSeleccionado == null) {
+
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(
+
+                    const SnackBar(
+                      content: Text(
+                        "Debes subir un archivo",
+                      ),
+                    ),
+                  );
+
+                  return;
+                }
+
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(
+
+                  const SnackBar(
+                    content: Text(
+                      "Enviado correctamente",
+                    ),
+                  ),
+                );
+              },
+
+              child: const Text(
+
+                "Enviar",
+
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      bottomNavigationBar: BottomNavigationBar(
+
+        selectedItemColor:
+            const Color(0xFFFFC107),
+
+        unselectedItemColor: Colors.grey,
+
+        currentIndex: 0,
+
+        onTap: (index) {
+
+          // HOME
+          if (index == 0) {
+
+            Navigator.pushReplacement(
+
+              context,
+
+              MaterialPageRoute(
+
+                builder: (context) => Home(
+                  rol: widget.rol,
+                  nombre: 'Usuario',
+                  correo: '',
+                ),
+              ),
+            );
+          }
+
+          // MIS HORAS
+          if (index == 1) {
+
+            Navigator.pushReplacement(
+
+              context,
+
+              MaterialPageRoute(
+
+                builder: (context) => MisHoras(
+                  rol: widget.rol,
+                ),
+              ),
+            );
+          }
+
+          // PERFIL
+          if (index == 2) {
+
+            Navigator.pushReplacement(
+
+              context,
+
+              MaterialPageRoute(
+
+                builder: (context) => Perfil(
+                  rol: widget.rol,
+                  nombre: 'Usuario',
+                  correo: '',
+                ),
+              ),
+            );
+          }
+        },
+
+        items: const [
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Inicio",
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.access_time),
+            label: "Mis horas",
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Perfil",
+          ),
+        ],
+      ),
+    );
+  }
+}
