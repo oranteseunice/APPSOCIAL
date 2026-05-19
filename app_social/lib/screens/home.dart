@@ -11,6 +11,7 @@ import 'admin/estadisticas_admin.dart';
 import 'admin/gestion_act.dart';
 
 class Home extends StatelessWidget {
+
   final String rol;
   final String nombre;
   final String correo;
@@ -30,8 +31,12 @@ class Home extends StatelessWidget {
       backgroundColor: const Color(0xFFF4F6FA),
 
       appBar: AppBar(
+
         backgroundColor: const Color(0xFF2E4A9E),
-        title: Text('Bienvenido $nombre'),
+
+        title: Text(
+          'Bienvenido $nombre',
+        ),
       ),
 
       body: SingleChildScrollView(
@@ -39,18 +44,21 @@ class Home extends StatelessWidget {
         padding: const EdgeInsets.all(20),
 
         child: Column(
+
           children: [
 
             const SizedBox(height: 20),
 
-            CircleAvatar(
-              radius: 60,
-              backgroundColor: Colors.grey.shade200,
+            // LOGO REDONDO
+            ClipOval(
 
-              child: const Icon(
-                Icons.school,
-                size: 50,
-                color: Color(0xFF2E4A9E),
+              child: Image.asset(
+                'assets/logo.jpeg',
+
+                width: 120,
+                height: 120,
+
+                fit: BoxFit.cover,
               ),
             ),
 
@@ -63,6 +71,7 @@ class Home extends StatelessWidget {
             if (rol != 'admin') ...[
 
               GestureDetector(
+
                 onTap: () {
 
                   Navigator.push(
@@ -89,6 +98,7 @@ class Home extends StatelessWidget {
               const SizedBox(height: 20),
 
               GestureDetector(
+
                 onTap: () {
 
                   Navigator.push(
@@ -115,6 +125,7 @@ class Home extends StatelessWidget {
               const SizedBox(height: 20),
 
               GestureDetector(
+
                 onTap: () {
 
                   Navigator.push(
@@ -150,8 +161,11 @@ class Home extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
 
                 decoration: BoxDecoration(
+
                   color: Colors.orange.shade200,
-                  borderRadius: BorderRadius.circular(12),
+
+                  borderRadius:
+                      BorderRadius.circular(12),
                 ),
 
                 child: const Text(
@@ -168,6 +182,7 @@ class Home extends StatelessWidget {
 
               // PUBLICAR ACTIVIDAD
               GestureDetector(
+
                 onTap: () {
 
                   Navigator.push(
@@ -193,6 +208,7 @@ class Home extends StatelessWidget {
 
               // GESTIONAR ACTIVIDADES
               GestureDetector(
+
                 onTap: () {
 
                   Navigator.push(
@@ -218,6 +234,7 @@ class Home extends StatelessWidget {
 
               // EVALUAR HORAS
               GestureDetector(
+
                 onTap: () {
 
                   Navigator.push(
@@ -243,6 +260,7 @@ class Home extends StatelessWidget {
 
               // ADMINISTRAR USUARIOS
               GestureDetector(
+
                 onTap: () {
 
                   Navigator.push(
@@ -361,15 +379,21 @@ class Home extends StatelessWidget {
       padding: const EdgeInsets.all(16),
 
       decoration: BoxDecoration(
+
         color: const Color(0xFF2E4A9E),
-        borderRadius: BorderRadius.circular(20),
+
+        borderRadius:
+            BorderRadius.circular(20),
       ),
 
       child: Row(
+
         children: [
 
           CircleAvatar(
-            backgroundColor: Colors.white24,
+
+            backgroundColor:
+                Colors.white24,
 
             child: Icon(
               icon,
@@ -380,6 +404,7 @@ class Home extends StatelessWidget {
           const SizedBox(width: 16),
 
           Expanded(
+
             child: Column(
 
               crossAxisAlignment:
@@ -388,6 +413,7 @@ class Home extends StatelessWidget {
               children: [
 
                 Text(
+
                   title,
 
                   style: const TextStyle(
@@ -397,6 +423,7 @@ class Home extends StatelessWidget {
                 ),
 
                 Text(
+
                   subtitle,
 
                   style: const TextStyle(

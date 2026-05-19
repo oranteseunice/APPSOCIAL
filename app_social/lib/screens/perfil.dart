@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+
 import 'home.dart';
 import 'mis_horas.dart';
+import 'admin/estadisticas_admin.dart';
 import 'login.dart';
 
 class Perfil extends StatelessWidget {
+
   final String rol;
   final String nombre;
   final String correo;
@@ -23,8 +26,10 @@ class Perfil extends StatelessWidget {
       backgroundColor: const Color(0xFFF4F6FA),
 
       appBar: AppBar(
+
         backgroundColor: const Color(0xFF2E4A9E),
-        title: const Text("Mi perfil"),
+
+        title: const Text('Mi perfil'),
       ),
 
       body: SingleChildScrollView(
@@ -32,28 +37,32 @@ class Perfil extends StatelessWidget {
         padding: const EdgeInsets.all(20),
 
         child: Column(
+
           children: [
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
-            const CircleAvatar(
-              radius: 60,
-              backgroundColor: Color(0xFF2E4A9E),
+            // FOTO / LOGO
+            ClipOval(
 
-              child: Icon(
-                Icons.person,
-                size: 60,
-                color: Colors.white,
+              child: Image.asset(
+                'assets/logo.jpeg',
+
+                width: 130,
+                height: 130,
+
+                fit: BoxFit.cover,
               ),
             ),
 
             const SizedBox(height: 20),
 
             Text(
+
               nombre,
 
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -61,114 +70,270 @@ class Perfil extends StatelessWidget {
             const SizedBox(height: 5),
 
             Text(
+
               rol,
 
-              style: const TextStyle(
-                color: Colors.grey,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 16,
               ),
             ),
 
             const SizedBox(height: 30),
 
-            _buildInfoCard(
-              Icons.email,
-              "Correo",
-              correo,
-            ),
+            // CORREO
+            Container(
 
-            const SizedBox(height: 15),
+              padding: const EdgeInsets.all(18),
 
-            // ESTUDIANTE
-            if (rol == 'estudiante') ...[
+              decoration: BoxDecoration(
 
-              _buildInfoCard(
-                Icons.school,
-                "Horas requeridas",
-                "500 horas",
+                color: Colors.white,
+
+                borderRadius:
+                    BorderRadius.circular(18),
               ),
 
-              const SizedBox(height: 15),
+              child: Row(
 
-              _buildInfoCard(
-                Icons.access_time,
-                "Horas completadas",
-                "160 horas",
-              ),
+                children: [
 
-            ] else ...[
-
-              // ADMIN
-              _buildInfoCard(
-                Icons.admin_panel_settings,
-                "Panel",
-                "Administrador",
-              ),
-
-              const SizedBox(height: 15),
-
-              _buildInfoCard(
-                Icons.groups,
-                "Permisos",
-                "Control total del sistema",
-              ),
-            ],
-
-            const SizedBox(height: 30),
-
-            ElevatedButton.icon(
-
-              style: ElevatedButton.styleFrom(
-
-                backgroundColor:
-                    const Color(0xFF2E4A9E),
-
-                foregroundColor:
-                    const Color(0xFFFFC107),
-
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 12,
-                ),
-              ),
-
-              onPressed: () {
-
-                Navigator.pushAndRemoveUntil(
-
-                  context,
-
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const Login(),
+                  const Icon(
+                    Icons.email,
+                    color: Color(0xFF2E4A9E),
                   ),
 
-                  (route) => false,
-                );
-              },
+                  const SizedBox(width: 15),
 
-              icon: const Icon(Icons.logout),
+                  Expanded(
 
-              label: const Text(
-                "Cerrar sesión",
+                    child: Column(
+
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+
+                      children: [
+
+                        Text(
+
+                          'Correo',
+
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        Text(
+
+                          correo,
+
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
 
+            const SizedBox(height: 18),
+
+            // PANEL
+            Container(
+
+              padding: const EdgeInsets.all(18),
+
+              decoration: BoxDecoration(
+
+                color: Colors.white,
+
+                borderRadius:
+                    BorderRadius.circular(18),
+              ),
+
+              child: Row(
+
+                children: [
+
+                  const Icon(
+                    Icons.admin_panel_settings,
+                    color: Color(0xFF2E4A9E),
+                  ),
+
+                  const SizedBox(width: 15),
+
+                  Expanded(
+
+                    child: Column(
+
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+
+                      children: [
+
+                        Text(
+
+                          'Panel',
+
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        Text(
+
+                          rol == 'admin'
+                              ? 'Administrador'
+                              : 'Estudiante',
+
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            // PERMISOS
+            Container(
+
+              padding: const EdgeInsets.all(18),
+
+              decoration: BoxDecoration(
+
+                color: Colors.white,
+
+                borderRadius:
+                    BorderRadius.circular(18),
+              ),
+
+              child: Row(
+
+                children: [
+
+                  const Icon(
+                    Icons.groups,
+                    color: Color(0xFF2E4A9E),
+                  ),
+
+                  const SizedBox(width: 15),
+
+                  Expanded(
+
+                    child: Column(
+
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+
+                      children: [
+
+                        Text(
+
+                          'Permisos',
+
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        Text(
+
+                          rol == 'admin'
+                              ? 'Control total del sistema'
+                              : 'Acceso a actividades',
+
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // BOTON CERRAR SESION
+            SizedBox(
+
+              width: 220,
+
+              child: ElevatedButton.icon(
+
+                style: ElevatedButton.styleFrom(
+
+                  backgroundColor:
+                      const Color(0xFF2E4A9E),
+
+                  foregroundColor: Colors.yellow,
+
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                  ),
+
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(30),
+                  ),
+                ),
+
+                onPressed: () {
+
+                  Navigator.pushReplacement(
+
+                    context,
+
+                    MaterialPageRoute(
+                      builder: (_) => const Login(),
+                    ),
+                  );
+                },
+
+                icon: const Icon(Icons.logout),
+
+                label: const Text(
+
+                  'Cerrar sesión',
+
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
 
+      // BOTTOM NAVIGATION
       bottomNavigationBar: BottomNavigationBar(
+
+        currentIndex: 2,
 
         selectedItemColor:
             const Color(0xFF2E4A9E),
 
-        unselectedItemColor: Colors.grey,
-
-        currentIndex: 2,
-
         onTap: (index) {
 
-          // HOME
+          // INICIO
           if (index == 0) {
 
             Navigator.pushReplacement(
@@ -177,7 +342,7 @@ class Perfil extends StatelessWidget {
 
               MaterialPageRoute(
 
-                builder: (context) => Home(
+                builder: (_) => Home(
                   rol: rol,
                   nombre: nombre,
                   correo: correo,
@@ -186,7 +351,7 @@ class Perfil extends StatelessWidget {
             );
           }
 
-          // MIS HORAS
+          // ESTADISTICAS O MIS HORAS
           if (index == 1) {
 
             Navigator.pushReplacement(
@@ -195,90 +360,47 @@ class Perfil extends StatelessWidget {
 
               MaterialPageRoute(
 
-                builder: (context) =>
-                    MisHoras(
-                  rol: rol,
-                ),
+                builder: (_) =>
+
+                    rol == 'admin'
+
+                        ? const EstadisticasAdmin()
+
+                        : MisHoras(
+                            rol: rol,
+                          ),
               ),
             );
           }
         },
 
-        items: const [
+        items: [
 
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: "Inicio",
+            label: 'Inicio',
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(Icons.access_time),
-            label: "Mis horas",
+
+            icon: Icon(
+
+              rol == 'admin'
+                  ? Icons.bar_chart
+                  : Icons.access_time,
+            ),
+
+            label:
+
+                rol == 'admin'
+                    ? 'Estadísticas'
+                    : 'Mis horas',
           ),
 
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: "Perfil",
+            label: 'Perfil',
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(
-    IconData icon,
-    String title,
-    String value,
-  ) {
-
-    return Container(
-
-      padding: const EdgeInsets.all(16),
-
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-
-      child: Row(
-        children: [
-
-          Icon(
-            icon,
-            color: const Color(0xFF2E4A9E),
-          ),
-
-          const SizedBox(width: 16),
-
-          Column(
-
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-
-            children: [
-
-              Text(
-                title,
-
-                style: const TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-
-              const SizedBox(height: 4),
-
-              Text(
-                value,
-
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-
-            ],
-          ),
-
         ],
       ),
     );

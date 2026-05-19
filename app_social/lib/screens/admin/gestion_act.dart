@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'publicar_actividad.dart';
+
 class GestionarActividades extends StatefulWidget {
   const GestionarActividades({super.key});
 
@@ -33,6 +35,7 @@ class _GestionarActividadesState
           .select();
 
       setState(() {
+
         actividades = response;
         cargando = false;
       });
@@ -82,11 +85,16 @@ class _GestionarActividadesState
       backgroundColor: const Color(0xFFF4F6FA),
 
       appBar: AppBar(
+
         backgroundColor: const Color(0xFF2E4A9E),
-        title: const Text('Gestionar actividades'),
+
+        title: const Text(
+          'Gestionar actividades',
+        ),
       ),
 
       body: cargando
+
           ? const Center(
               child: CircularProgressIndicator(),
             )
@@ -111,75 +119,173 @@ class _GestionarActividadesState
 
                     return Container(
 
-                      margin: const EdgeInsets.only(bottom: 20),
+                      margin:
+                          const EdgeInsets.only(bottom: 20),
 
                       padding: const EdgeInsets.all(18),
 
                       decoration: BoxDecoration(
+
                         color: Colors.white,
+
                         borderRadius:
-                            BorderRadius.circular(18),
+                            BorderRadius.circular(20),
+
+                        boxShadow: [
+
+                          BoxShadow(
+
+                            color: Colors.black12,
+
+                            blurRadius: 8,
+
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
 
                       child: Column(
+
                         crossAxisAlignment:
                             CrossAxisAlignment.start,
 
                         children: [
 
                           Text(
-                            actividad['titulo'],
+
+                            actividad['titulo'] ?? '',
+
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 12),
 
                           Text(
-                            actividad['descripcion'],
+                            actividad['descripcion'] ?? '',
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 12),
 
                           Text(
                             'Horas máximas: ${actividad['horas_maximas']}',
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 8),
 
                           Text(
                             'Categoría: ${actividad['categoria']}',
                           ),
 
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 25),
 
-                          Align(
-                            alignment: Alignment.centerRight,
+                          Row(
 
-                            child: ElevatedButton.icon(
+                            mainAxisAlignment:
+                                MainAxisAlignment.end,
 
-                              style:
-                                  ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
+                            children: [
+
+                              // BOTON EDITAR
+                              SizedBox(
+
+                                width: 110,
+
+                                child: ElevatedButton.icon(
+
+                                  style:
+                                      ElevatedButton.styleFrom(
+
+                                    backgroundColor:
+                                        Colors.orange,
+
+                                    foregroundColor:
+                                        Colors.white,
+
+                                    shape:
+                                        RoundedRectangleBorder(
+
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                              20),
+                                    ),
+                                  ),
+
+                                  onPressed: () {
+
+                                    Navigator.push(
+
+                                      context,
+
+                                      MaterialPageRoute(
+
+                                        builder: (_) =>
+                                            PublicarActividad(
+
+                                          actividadEditar:
+                                              actividad,
+                                        ),
+                                      ),
+                                    );
+                                  },
+
+                                  icon: const Icon(
+                                    Icons.edit,
+                                  ),
+
+                                  label: const Text(
+                                    'Editar',
+                                  ),
+                                ),
                               ),
 
-                              onPressed: () {
+                              const SizedBox(width: 12),
 
-                                eliminarActividad(
-                                  actividad['id_actividad'],
-                                );
-                              },
+                              // BOTON ELIMINAR
+                              SizedBox(
 
-                              icon: const Icon(
-                                Icons.delete,
+                                width: 150,
+
+                                child: ElevatedButton.icon(
+
+                                  style:
+                                      ElevatedButton.styleFrom(
+
+                                    backgroundColor:
+                                        Colors.red,
+
+                                    foregroundColor:
+                                        Colors.white,
+
+                                    shape:
+                                        RoundedRectangleBorder(
+
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                              20),
+                                    ),
+                                  ),
+
+                                  onPressed: () {
+
+                                    eliminarActividad(
+                                      actividad[
+                                          'id_actividad'],
+                                    );
+                                  },
+
+                                  icon: const Icon(
+                                    Icons.delete,
+                                  ),
+
+                                  label: const Text(
+                                    'Eliminar',
+                                  ),
+                                ),
                               ),
-
-                              label: const Text(
-                                'Eliminar',
-                              ),
-                            ),
+                            ],
                           ),
                         ],
                       ),
