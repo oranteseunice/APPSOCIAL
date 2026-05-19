@@ -15,7 +15,7 @@ class _PublicarActividadState extends State<PublicarActividad> {
   final tituloController = TextEditingController();
   final descripcionController = TextEditingController();
   final horasController = TextEditingController();
-  final lugarController = TextEditingController();
+  final categoriaController = TextEditingController();
 
   Future<void> publicarActividad() async {
 
@@ -23,7 +23,7 @@ class _PublicarActividadState extends State<PublicarActividad> {
       tituloController.text.isEmpty ||
       descripcionController.text.isEmpty ||
       horasController.text.isEmpty ||
-      lugarController.text.isEmpty
+      categoriaController.text.isEmpty
     ) {
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -43,24 +43,26 @@ class _PublicarActividadState extends State<PublicarActividad> {
 
         'descripcion': descripcionController.text.trim(),
 
-        'horas': int.parse(
+        'horas_maximas': int.parse(
           horasController.text.trim(),
         ),
 
-        'lugar': lugarController.text.trim(),
+        'categoria': categoriaController.text.trim(),
+
+        'creador': 'Administrador',
 
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Actividad publicada'),
+          content: Text('Actividad publicada correctamente'),
         ),
       );
 
       tituloController.clear();
       descripcionController.clear();
       horasController.clear();
-      lugarController.clear();
+      categoriaController.clear();
 
     } catch (e) {
 
@@ -130,7 +132,7 @@ class _PublicarActividadState extends State<PublicarActividad> {
               keyboardType: TextInputType.number,
 
               decoration: InputDecoration(
-                labelText: 'Horas',
+                labelText: 'Horas máximas',
 
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -141,10 +143,12 @@ class _PublicarActividadState extends State<PublicarActividad> {
             const SizedBox(height: 20),
 
             TextField(
-              controller: lugarController,
+              controller: categoriaController,
 
               decoration: InputDecoration(
-                labelText: 'Lugar',
+                labelText: 'Categoría',
+
+                hintText: 'Social, ecológica, educativa...',
 
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),

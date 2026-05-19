@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'home.dart';
 import 'mis_horas.dart';
@@ -22,6 +24,8 @@ class _RegistrarActividadState
     extends State<RegistrarActividad> {
 
   File? archivoSeleccionado;
+
+  String? nombreArchivo;
 
   final TextEditingController comentarioController =
       TextEditingController();
@@ -116,14 +120,32 @@ class _RegistrarActividadState
                 ),
               ),
 
-              onPressed: () {
+              onPressed: () async {
 
-                setState(() {
+                FilePickerResult? result =
+                    await FilePicker.platform.pickFiles(
 
-                  archivoSeleccionado =
-                      File("evidencia.pdf");
+                  type: FileType.custom,
 
-                });
+                  allowedExtensions: [
+                    'pdf',
+                    'png',
+                    'jpg',
+                    'jpeg',
+                  ],
+                );
+
+                if (result != null) {
+
+                  setState(() {
+
+                    archivoSeleccionado =
+                        File(result.files.single.path!);
+
+                    nombreArchivo =
+                        result.files.single.name;
+                  });
+                }
               },
 
               icon: const Icon(Icons.attach_file),
@@ -161,17 +183,16 @@ class _RegistrarActividadState
 
                     const SizedBox(width: 10),
 
-                    const Expanded(
+                    Expanded(
                       child: Text(
 
-                        "Archivo: evidencia.pdf",
+                        "Archivo: $nombreArchivo",
 
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -200,7 +221,7 @@ class _RegistrarActividadState
                 ),
               ),
 
-              onPressed: () {
+              onPressed: () async {
 
                 if (archivoSeleccionado == null) {
 
@@ -217,15 +238,67 @@ class _RegistrarActividadState
                   return;
                 }
 
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(
+                try {
 
-                  const SnackBar(
-                    content: Text(
-                      "Enviado correctamente",
+                  final nombre =
+                      DateTime.now()
+                          .millisecondsSinceEpoch
+                          .toString();
+
+                  // SUBIR ARCHIVO
+                  await Supabase.instance.client.storage
+                      .from('evidencias')
+                      .upload(
+                        nombre,
+                        archivoSeleccionado!,
+                      );
+
+                  // OBTENER URL
+                  final url =
+                      Supabase.instance.client.storage
+                          .from('evidencias')
+                          .getPublicUrl(nombre);
+
+                  // GUARDAR EN TABLA
+                  await Supabase.instance.client
+                      .from('evidencias')
+                      .insert({
+
+                    'id_usuario': 2,
+
+                    'id_actividad': 1,
+
+                    'comentario':
+                        comentarioController.text,
+
+                    'archivo': url,
+
+                    'estado': 'entregado',
+
+                  });
+
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(
+
+                    const SnackBar(
+                      content: Text(
+                        "Enviado correctamente",
+                      ),
                     ),
-                  ),
-                );
+                  );
+
+                } catch (e) {
+
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(
+
+                    SnackBar(
+                      content: Text(
+                        "Error: $e",
+                      ),
+                    ),
+                  );
+                }
               },
 
               child: const Text(
@@ -253,7 +326,6 @@ class _RegistrarActividadState
 
         onTap: (index) {
 
-          // HOME
           if (index == 0) {
 
             Navigator.pushReplacement(
@@ -271,7 +343,6 @@ class _RegistrarActividadState
             );
           }
 
-          // MIS HORAS
           if (index == 1) {
 
             Navigator.pushReplacement(
@@ -287,7 +358,6 @@ class _RegistrarActividadState
             );
           }
 
-          // PERFIL
           if (index == 2) {
 
             Navigator.pushReplacement(
