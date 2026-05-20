@@ -8,6 +8,7 @@ import 'mis_horas.dart';
 import 'perfil.dart';
 
 class RegistrarActividad extends StatefulWidget {
+
   final String rol;
 
   const RegistrarActividad({
@@ -23,10 +24,13 @@ class RegistrarActividad extends StatefulWidget {
 class _RegistrarActividadState
     extends State<RegistrarActividad> {
 
+  // ARCHIVO SELECCIONADO
   File? archivoSeleccionado;
 
+  // NOMBRE DEL ARCHIVO
   String? nombreArchivo;
 
+  // CONTROLADOR COMENTARIO
   final TextEditingController comentarioController =
       TextEditingController();
 
@@ -37,11 +41,13 @@ class _RegistrarActividadState
 
       backgroundColor: const Color(0xFFF4F6FA),
 
+      // APPBAR
       appBar: AppBar(
         backgroundColor: const Color(0xFF2E4A9E),
         title: const Text("Subir evidencia"),
       ),
 
+      // BODY
       body: SingleChildScrollView(
 
         padding: const EdgeInsets.all(20),
@@ -51,7 +57,9 @@ class _RegistrarActividadState
 
             const SizedBox(height: 20),
 
+            // TEXTO
             const Text(
+
               "Sube evidencia de la actividad realizada",
 
               style: TextStyle(
@@ -62,6 +70,7 @@ class _RegistrarActividadState
 
             const SizedBox(height: 25),
 
+            // CAMPO COMENTARIO
             TextField(
 
               controller: comentarioController,
@@ -100,13 +109,15 @@ class _RegistrarActividadState
 
             const SizedBox(height: 25),
 
+            // BOTON SUBIR ARCHIVO
             ElevatedButton.icon(
 
               style: ElevatedButton.styleFrom(
 
                 backgroundColor: Colors.white,
 
-                foregroundColor: const Color(0xFF2E4A9E),
+                foregroundColor:
+                    const Color(0xFF2E4A9E),
 
                 elevation: 2,
 
@@ -122,6 +133,7 @@ class _RegistrarActividadState
 
               onPressed: () async {
 
+                // SELECCIONAR ARCHIVO
                 FilePickerResult? result =
                     await FilePicker.platform.pickFiles(
 
@@ -135,6 +147,7 @@ class _RegistrarActividadState
                   ],
                 );
 
+                // VALIDAR SI SELECCIONÓ
                 if (result != null) {
 
                   setState(() {
@@ -162,6 +175,7 @@ class _RegistrarActividadState
 
             const SizedBox(height: 20),
 
+            // MOSTRAR ARCHIVO
             if (archivoSeleccionado != null)
 
               Container(
@@ -199,6 +213,7 @@ class _RegistrarActividadState
 
             const SizedBox(height: 35),
 
+            // BOTON ENVIAR
             ElevatedButton(
 
               style: ElevatedButton.styleFrom(
@@ -223,6 +238,7 @@ class _RegistrarActividadState
 
               onPressed: () async {
 
+                // VALIDAR ARCHIVO
                 if (archivoSeleccionado == null) {
 
                   ScaffoldMessenger.of(context)
@@ -240,12 +256,13 @@ class _RegistrarActividadState
 
                 try {
 
+                  // NOMBRE ÚNICO
                   final nombre =
                       DateTime.now()
                           .millisecondsSinceEpoch
                           .toString();
 
-                  // SUBIR ARCHIVO
+                  // SUBIR ARCHIVO A STORAGE
                   await Supabase.instance.client.storage
                       .from('evidencias')
                       .upload(
@@ -264,19 +281,25 @@ class _RegistrarActividadState
                       .from('evidencias')
                       .insert({
 
+                    // USUARIO
                     'id_usuario': 2,
 
-                    'id_actividad': 1,
+                    // ACTIVIDAD EXISTENTE
+                    'id_actividad': 4,
 
+                    // COMENTARIO
                     'comentario':
                         comentarioController.text,
 
+                    // URL ARCHIVO
                     'archivo': url,
 
-                    'estado': 'entregado',
+                    // ESTADO
+                    'estado': 'pendiente',
 
                   });
 
+                  // MENSAJE ÉXITO
                   ScaffoldMessenger.of(context)
                       .showSnackBar(
 
@@ -289,6 +312,7 @@ class _RegistrarActividadState
 
                 } catch (e) {
 
+                  // MENSAJE ERROR
                   ScaffoldMessenger.of(context)
                       .showSnackBar(
 
@@ -315,6 +339,7 @@ class _RegistrarActividadState
         ),
       ),
 
+      // BOTTOM NAVIGATION
       bottomNavigationBar: BottomNavigationBar(
 
         selectedItemColor:
@@ -326,6 +351,7 @@ class _RegistrarActividadState
 
         onTap: (index) {
 
+          // INICIO
           if (index == 0) {
 
             Navigator.pushReplacement(
@@ -343,6 +369,7 @@ class _RegistrarActividadState
             );
           }
 
+          // MIS HORAS
           if (index == 1) {
 
             Navigator.pushReplacement(
@@ -358,6 +385,7 @@ class _RegistrarActividadState
             );
           }
 
+          // PERFIL
           if (index == 2) {
 
             Navigator.pushReplacement(

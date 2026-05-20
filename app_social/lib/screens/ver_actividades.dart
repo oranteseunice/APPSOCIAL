@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// IMPORTAR PANTALLAS
 import 'home.dart';
 import 'mis_horas.dart';
 import 'perfil.dart';
 
+// PANTALLA VER ACTIVIDADES
 class VerActividades extends StatefulWidget {
+
+  // ROL DEL USUARIO
   final String rol;
 
   const VerActividades({
@@ -21,62 +25,159 @@ class VerActividades extends StatefulWidget {
 class _VerActividadesState
     extends State<VerActividades> {
 
-  final supabase = Supabase.instance.client;
+  // INSTANCIA SUPABASE
+  final supabase =
+      Supabase.instance.client;
 
+  // LISTA ACTIVIDADES
   List actividades = [];
 
+  // LISTA FILTRADA
+  List actividadesFiltradas = [];
+
+  // CONTROLADOR BUSCADOR
+  final buscarController =
+      TextEditingController();
+
+  // CONTROL LOADING
   bool cargando = true;
 
   @override
   void initState() {
+
     super.initState();
+
+    // OBTENER ACTIVIDADES
     obtenerActividades();
   }
 
+  // OBTENER ACTIVIDADES DESDE SUPABASE
   Future<void> obtenerActividades() async {
 
     try {
 
       final response = await supabase
+
           .from('actividades')
+
           .select()
-          .order('id_actividad');
+
+          .order(
+            'id_actividad',
+          );
 
       setState(() {
+
         actividades = response;
+
+        actividadesFiltradas =
+            response;
+
         cargando = false;
       });
 
     } catch (e) {
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+
+          .showSnackBar(
+
         SnackBar(
-          content: Text('Error: $e'),
+
+          content: Text(
+            'Error: $e',
+          ),
         ),
       );
 
       setState(() {
+
         cargando = false;
       });
-
     }
   }
 
-  IconData obtenerIcono(String categoria) {
+  // BUSCAR ACTIVIDAD
+  void buscarActividad(
+    String texto,
+  ) {
 
-    switch (categoria.toLowerCase()) {
+    final resultado =
+        actividades.where((actividad) {
+
+      final titulo =
+          actividad['titulo']
+              .toString()
+              .toLowerCase();
+
+      return titulo.contains(
+        texto.toLowerCase(),
+      );
+
+    }).toList();
+
+    setState(() {
+
+      actividadesFiltradas =
+          resultado;
+    });
+  }
+
+  // OBTENER ICONO SEGÚN CATEGORÍA
+  IconData obtenerIcono(
+    String categoria,
+  ) {
+
+    switch (
+        categoria.toLowerCase()) {
 
       case 'ambiental':
+
         return Icons.eco;
 
       case 'limpieza':
+
         return Icons.cleaning_services;
 
       case 'educativa':
+
         return Icons.school;
 
+      case 'social':
+
+        return Icons.people;
+
       default:
+
         return Icons.volunteer_activism;
+    }
+  }
+
+  // OBTENER COLOR SEGÚN CATEGORÍA
+  Color obtenerColor(
+    String categoria,
+  ) {
+
+    switch (
+        categoria.toLowerCase()) {
+
+      case 'ambiental':
+
+        return Colors.green;
+
+      case 'educativa':
+
+        return Colors.blue;
+
+      case 'social':
+
+        return Colors.orange;
+
+      default:
+
+        return const Color(
+          0xFF2E4A9E,
+        );
     }
   }
 
@@ -85,65 +186,202 @@ class _VerActividadesState
 
     return Scaffold(
 
-      backgroundColor: const Color(0xFFF4F6FA),
+      // COLOR FONDO
+      backgroundColor:
+          const Color(0xFFF4F6FA),
 
+      // APPBAR
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2E4A9E),
-        title: const Text("Actividades"),
+
+        backgroundColor:
+            const Color(0xFF2E4A9E),
+
+        title: const Text(
+          "Actividades",
+        ),
       ),
 
-      body: cargando
+      body: Column(
 
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+        children: [
 
-          : actividades.isEmpty
+          const SizedBox(
+            height: 20,
+          ),
 
-              ? const Center(
-                  child: Text(
-                    'No hay actividades disponibles',
+          // BUSCADOR
+          Padding(
+
+            padding:
+                const EdgeInsets.symmetric(
+              horizontal: 20,
+            ),
+
+            child: TextField(
+
+              controller:
+                  buscarController,
+
+              onChanged:
+                  buscarActividad,
+
+              decoration: InputDecoration(
+
+                hintText:
+                    'Buscar actividad',
+
+                prefixIcon:
+                    const Icon(
+                  Icons.search,
+                ),
+
+                filled: true,
+
+                fillColor:
+                    Colors.white,
+
+                border:
+                    OutlineInputBorder(
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    15,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(
+            height: 15,
+          ),
+
+          // LOADING
+          cargando
+
+              ? const Expanded(
+
+                  child: Center(
+
+                    child:
+                        CircularProgressIndicator(),
                   ),
                 )
 
-              : ListView.builder(
+              // EMPTY STATE
+              : actividadesFiltradas
+                      .isEmpty
 
-                  padding: const EdgeInsets.all(20),
+                  ? Expanded(
 
-                  itemCount: actividades.length,
+                      child: Center(
 
-                  itemBuilder: (context, index) {
+                        child: Column(
 
-                    final actividad =
-                        actividades[index];
+                          mainAxisAlignment:
+                              MainAxisAlignment.center,
 
-                    return Padding(
+                          children: [
 
-                      padding: const EdgeInsets.only(
-                        bottom: 15,
+                            Icon(
+
+                              Icons.event_busy,
+
+                              size: 90,
+
+                              color:
+                                  Colors.grey.shade400,
+                            ),
+
+                            const SizedBox(
+                              height: 20,
+                            ),
+
+                            Text(
+
+                              'No hay actividades disponibles',
+
+                              style: TextStyle(
+
+                                fontSize: 18,
+
+                                color:
+                                    Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                    )
 
-                      child: _buildCard(
+                  // LISTA
+                  : Expanded(
 
-                        obtenerIcono(
-                          actividad['categoria'] ?? '',
+                      child:
+                          ListView.builder(
+
+                        padding:
+                            const EdgeInsets.all(
+                          20,
                         ),
 
-                        actividad['titulo'] ?? '',
+                        itemCount:
+                            actividadesFiltradas
+                                .length,
 
-                        '${actividad['horas_maximas']} horas',
+                        itemBuilder:
+                            (context, index) {
 
+                          final actividad =
+                              actividadesFiltradas[
+                                  index];
+
+                          final categoria =
+                              actividad[
+                                      'categoria'] ??
+                                  '';
+
+                          return Padding(
+
+                            padding:
+                                const EdgeInsets.only(
+                              bottom: 18,
+                            ),
+
+                            child: _buildCard(
+
+                              obtenerIcono(
+                                categoria,
+                              ),
+
+                              actividad[
+                                      'titulo'] ??
+                                  '',
+
+                              actividad[
+                                      'descripcion'] ??
+                                  '',
+
+                              '${actividad['horas_maximas']} horas',
+
+                              categoria,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
+                    ),
+        ],
+      ),
 
-      bottomNavigationBar: BottomNavigationBar(
+      // BOTTOM NAVIGATION
+      bottomNavigationBar:
+          BottomNavigationBar(
 
         selectedItemColor:
             const Color(0xFF2E4A9E),
 
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor:
+            Colors.grey,
 
         currentIndex: 0,
 
@@ -158,14 +396,14 @@ class _VerActividadesState
 
               MaterialPageRoute(
 
-                builder: (context) => Home(
+                builder: (context) =>
+                    Home(
 
                   rol: widget.rol,
 
                   nombre: 'Usuario',
 
                   correo: '',
-
                 ),
               ),
             );
@@ -180,7 +418,9 @@ class _VerActividadesState
 
               MaterialPageRoute(
 
-                builder: (context) => MisHoras(
+                builder: (context) =>
+                    MisHoras(
+
                   rol: widget.rol,
                 ),
               ),
@@ -196,14 +436,14 @@ class _VerActividadesState
 
               MaterialPageRoute(
 
-                builder: (context) => Perfil(
+                builder: (context) =>
+                    Perfil(
 
                   rol: widget.rol,
 
                   nombre: 'Usuario',
 
                   correo: '',
-
                 ),
               ),
             );
@@ -213,76 +453,252 @@ class _VerActividadesState
         items: const [
 
           BottomNavigationBarItem(
+
             icon: Icon(Icons.home),
+
             label: "Inicio",
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(Icons.access_time),
+
+            icon:
+                Icon(Icons.access_time),
+
             label: "Mis horas",
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+
+            icon:
+                Icon(Icons.person),
+
             label: "Perfil",
           ),
-
         ],
       ),
     );
   }
 
+  // CARD ACTIVIDAD
   Widget _buildCard(
+
     IconData icon,
+
     String title,
+
+    String descripcion,
+
     String horas,
+
+    String categoria,
   ) {
 
     return Container(
 
-      padding: const EdgeInsets.all(16),
+      padding:
+          const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
 
         color: Colors.white,
 
-        borderRadius: BorderRadius.circular(16),
+        borderRadius:
+            BorderRadius.circular(20),
 
+        boxShadow: [
+
+          BoxShadow(
+
+            color: Colors.black12,
+
+            blurRadius: 6,
+
+            offset: const Offset(
+              0,
+              4,
+            ),
+          ),
+        ],
       ),
 
-      child: Row(
+      child: Column(
+
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+
         children: [
 
-          Icon(
-            icon,
-            color: const Color(0xFF2E4A9E),
-          ),
-
-          const SizedBox(width: 16),
-
-          Column(
-
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+          // ICONO + CATEGORIA
+          Row(
 
             children: [
 
-              Text(title),
+              CircleAvatar(
 
-              const SizedBox(height: 4),
+                backgroundColor:
+                    obtenerColor(
+                  categoria,
+                ),
+
+                child: Icon(
+
+                  icon,
+
+                  color: Colors.white,
+                ),
+              ),
+
+              const SizedBox(
+                width: 12,
+              ),
+
+              Expanded(
+
+                child: Text(
+
+                  categoria,
+
+                  style:
+                      const TextStyle(
+
+                    fontWeight:
+                        FontWeight.bold,
+
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(
+            height: 18,
+          ),
+
+          // TITULO
+          Text(
+
+            title,
+
+            style: const TextStyle(
+
+              fontSize: 20,
+
+              fontWeight:
+                  FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(
+            height: 10,
+          ),
+
+          // DESCRIPCIÓN
+          Text(
+
+            descripcion,
+
+            style: TextStyle(
+
+              color:
+                  Colors.grey.shade700,
+            ),
+          ),
+
+          const SizedBox(
+            height: 15,
+          ),
+
+          // HORAS
+          Row(
+
+            children: [
+
+              const Icon(
+                Icons.access_time,
+                size: 20,
+              ),
+
+              const SizedBox(
+                width: 8,
+              ),
 
               Text(
 
                 horas,
 
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                style:
+                    const TextStyle(
+
+                  fontWeight:
+                      FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(
+            height: 20,
+          ),
+
+          // BOTON INSCRIPCIÓN
+          SizedBox(
+
+            width: double.infinity,
+
+            child:
+                ElevatedButton.icon(
+
+              style:
+                  ElevatedButton.styleFrom(
+
+                backgroundColor:
+                    const Color(
+                  0xFF2E4A9E,
+                ),
+
+                foregroundColor:
+                    Colors.white,
+
+                padding:
+                    const EdgeInsets.symmetric(
+                  vertical: 14,
+                ),
+
+                shape:
+                    RoundedRectangleBorder(
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    15,
+                  ),
                 ),
               ),
 
-            ],
-          )
+              onPressed: () {
 
+                ScaffoldMessenger.of(
+                        context)
+                    .showSnackBar(
+
+                  const SnackBar(
+
+                    content: Text(
+                      'Inscripción disponible próximamente',
+                    ),
+                  ),
+                );
+              },
+
+              icon: const Icon(
+                Icons.app_registration,
+              ),
+
+              label: const Text(
+                'Inscribirse',
+              ),
+            ),
+          ),
         ],
       ),
     );

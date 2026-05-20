@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// IMPORTAR PANTALLA EDITAR
 import 'publicar_actividad.dart';
 
+// IMPORTAR CARD
+import '../../widgets/card_actividad.dart';
+
+// PANTALLA GESTIONAR ACTIVIDADES
 class GestionarActividades extends StatefulWidget {
-  const GestionarActividades({super.key});
+
+  const GestionarActividades({
+    super.key,
+  });
 
   @override
   State<GestionarActividades> createState() =>
@@ -14,67 +22,210 @@ class GestionarActividades extends StatefulWidget {
 class _GestionarActividadesState
     extends State<GestionarActividades> {
 
-  final supabase = Supabase.instance.client;
+  // INSTANCIA SUPABASE
+  final supabase =
+      Supabase.instance.client;
 
+  // LISTA ORIGINAL
   List actividades = [];
 
+  // LISTA FILTRADA
+  List actividadesFiltradas = [];
+
+  // CONTROLADOR BUSCADOR
+  final buscarController =
+      TextEditingController();
+
+  // CONTROL CARGA
   bool cargando = true;
 
   @override
   void initState() {
+
     super.initState();
+
     obtenerActividades();
   }
 
+  // OBTENER ACTIVIDADES
   Future<void> obtenerActividades() async {
 
     try {
 
       final response = await supabase
+
           .from('actividades')
+
           .select();
 
       setState(() {
 
         actividades = response;
+
+        actividadesFiltradas =
+            response;
+
         cargando = false;
       });
 
     } catch (e) {
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+
+          .showSnackBar(
+
         SnackBar(
-          content: Text('Error: $e'),
+
+          content: Text(
+            'Error: $e',
+          ),
         ),
       );
     }
   }
 
-  Future<void> eliminarActividad(int id) async {
+  // BUSCAR ACTIVIDAD
+  void buscarActividad(
+    String texto,
+  ) {
+
+    final resultado =
+        actividades.where((actividad) {
+
+      final titulo =
+          actividad['titulo']
+              .toString()
+              .toLowerCase();
+
+      return titulo.contains(
+        texto.toLowerCase(),
+      );
+
+    }).toList();
+
+    setState(() {
+
+      actividadesFiltradas =
+          resultado;
+    });
+  }
+
+  // ELIMINAR ACTIVIDAD
+  Future<void> eliminarActividad(
+    int id,
+  ) async {
 
     try {
 
       await supabase
-          .from('actividades')
-          .delete()
-          .eq('id_actividad', id);
 
+          .from('actividades')
+
+          .delete()
+
+          .eq(
+            'id_actividad',
+            id,
+          );
+
+      // RECARGAR ACTIVIDADES
       obtenerActividades();
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+
+          .showSnackBar(
+
         const SnackBar(
-          content: Text('Actividad eliminada'),
+
+          content: Text(
+            'Actividad eliminada',
+          ),
         ),
       );
 
     } catch (e) {
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+
+          .showSnackBar(
+
         SnackBar(
-          content: Text('Error: $e'),
+
+          content: Text(
+            'Error: $e',
+          ),
         ),
       );
     }
+  }
+
+  // CONFIRMAR ELIMINACIÓN
+  void confirmarEliminar(
+    int id,
+  ) {
+
+    showDialog(
+
+      context: context,
+
+      builder: (context) {
+
+        return AlertDialog(
+
+          title: const Text(
+            'Eliminar actividad',
+          ),
+
+          content: const Text(
+            '¿Deseas eliminar esta actividad?',
+          ),
+
+          actions: [
+
+            // CANCELAR
+            TextButton(
+
+              onPressed: () {
+
+                Navigator.pop(
+                  context,
+                );
+              },
+
+              child: const Text(
+                'Cancelar',
+              ),
+            ),
+
+            // ELIMINAR
+            ElevatedButton(
+
+              style:
+                  ElevatedButton.styleFrom(
+
+                backgroundColor:
+                    Colors.red,
+              ),
+
+              onPressed: () {
+
+                Navigator.pop(
+                  context,
+                );
+
+                eliminarActividad(
+                  id,
+                );
+              },
+
+              child: const Text(
+                'Eliminar',
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -82,216 +233,197 @@ class _GestionarActividadesState
 
     return Scaffold(
 
-      backgroundColor: const Color(0xFFF4F6FA),
+      // COLOR FONDO
+      backgroundColor:
+          const Color(0xFFF4F6FA),
 
+      // APPBAR
       appBar: AppBar(
 
-        backgroundColor: const Color(0xFF2E4A9E),
+        backgroundColor:
+            const Color(0xFF2E4A9E),
 
         title: const Text(
           'Gestionar actividades',
         ),
       ),
 
-      body: cargando
+      body: Column(
 
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+        children: [
 
-          : actividades.isEmpty
+          const SizedBox(
+            height: 20,
+          ),
 
-              ? const Center(
-                  child: Text(
-                    'No hay actividades publicadas',
+          // BUSCADOR
+          Padding(
+
+            padding:
+                const EdgeInsets.symmetric(
+              horizontal: 20,
+            ),
+
+            child: TextField(
+
+              controller:
+                  buscarController,
+
+              onChanged:
+                  buscarActividad,
+
+              decoration: InputDecoration(
+
+                hintText:
+                    'Buscar actividad',
+
+                prefixIcon:
+                    const Icon(
+                  Icons.search,
+                ),
+
+                filled: true,
+
+                fillColor:
+                    Colors.white,
+
+                border:
+                    OutlineInputBorder(
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    15,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(
+            height: 15,
+          ),
+
+          // LOADING
+          cargando
+
+              ? const Expanded(
+
+                  child: Center(
+
+                    child:
+                        CircularProgressIndicator(),
                   ),
                 )
 
-              : ListView.builder(
+              // EMPTY STATE
+              : actividadesFiltradas
+                      .isEmpty
 
-                  padding: const EdgeInsets.all(20),
+                  ? Expanded(
 
-                  itemCount: actividades.length,
+                      child: Center(
 
-                  itemBuilder: (context, index) {
+                        child: Column(
 
-                    final actividad = actividades[index];
+                          mainAxisAlignment:
+                              MainAxisAlignment
+                                  .center,
 
-                    return Container(
+                          children: [
 
-                      margin:
-                          const EdgeInsets.only(bottom: 20),
+                            Icon(
 
-                      padding: const EdgeInsets.all(18),
+                              Icons.event_busy,
 
-                      decoration: BoxDecoration(
+                              size: 90,
 
-                        color: Colors.white,
-
-                        borderRadius:
-                            BorderRadius.circular(20),
-
-                        boxShadow: [
-
-                          BoxShadow(
-
-                            color: Colors.black12,
-
-                            blurRadius: 8,
-
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-
-                      child: Column(
-
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-
-                        children: [
-
-                          Text(
-
-                            actividad['titulo'] ?? '',
-
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
+                              color:
+                                  Colors.grey
+                                      .shade400,
                             ),
-                          ),
 
-                          const SizedBox(height: 12),
+                            const SizedBox(
+                              height: 20,
+                            ),
 
-                          Text(
-                            actividad['descripcion'] ?? '',
-                          ),
+                            Text(
 
-                          const SizedBox(height: 12),
+                              'No hay actividades',
 
-                          Text(
-                            'Horas máximas: ${actividad['horas_maximas']}',
-                          ),
+                              style: TextStyle(
 
-                          const SizedBox(height: 8),
+                                fontSize: 18,
 
-                          Text(
-                            'Categoría: ${actividad['categoria']}',
-                          ),
-
-                          const SizedBox(height: 25),
-
-                          Row(
-
-                            mainAxisAlignment:
-                                MainAxisAlignment.end,
-
-                            children: [
-
-                              // BOTON EDITAR
-                              SizedBox(
-
-                                width: 110,
-
-                                child: ElevatedButton.icon(
-
-                                  style:
-                                      ElevatedButton.styleFrom(
-
-                                    backgroundColor:
-                                        Colors.orange,
-
-                                    foregroundColor:
-                                        Colors.white,
-
-                                    shape:
-                                        RoundedRectangleBorder(
-
-                                      borderRadius:
-                                          BorderRadius.circular(
-                                              20),
-                                    ),
-                                  ),
-
-                                  onPressed: () {
-
-                                    Navigator.push(
-
-                                      context,
-
-                                      MaterialPageRoute(
-
-                                        builder: (_) =>
-                                            PublicarActividad(
-
-                                          actividadEditar:
-                                              actividad,
-                                        ),
-                                      ),
-                                    );
-                                  },
-
-                                  icon: const Icon(
-                                    Icons.edit,
-                                  ),
-
-                                  label: const Text(
-                                    'Editar',
-                                  ),
-                                ),
+                                color:
+                                    Colors.grey
+                                        .shade600,
                               ),
-
-                              const SizedBox(width: 12),
-
-                              // BOTON ELIMINAR
-                              SizedBox(
-
-                                width: 150,
-
-                                child: ElevatedButton.icon(
-
-                                  style:
-                                      ElevatedButton.styleFrom(
-
-                                    backgroundColor:
-                                        Colors.red,
-
-                                    foregroundColor:
-                                        Colors.white,
-
-                                    shape:
-                                        RoundedRectangleBorder(
-
-                                      borderRadius:
-                                          BorderRadius.circular(
-                                              20),
-                                    ),
-                                  ),
-
-                                  onPressed: () {
-
-                                    eliminarActividad(
-                                      actividad[
-                                          'id_actividad'],
-                                    );
-                                  },
-
-                                  icon: const Icon(
-                                    Icons.delete,
-                                  ),
-
-                                  label: const Text(
-                                    'Eliminar',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
-                    );
-                  },
-                ),
+                    )
+
+                  // LISTA ACTIVIDADES
+                  : Expanded(
+
+                      child:
+                          ListView.builder(
+
+                        padding:
+                            const EdgeInsets.all(
+                          20,
+                        ),
+
+                        itemCount:
+                            actividadesFiltradas
+                                .length,
+
+                        itemBuilder:
+                            (context, index) {
+
+                          final actividad =
+                              actividadesFiltradas[
+                                  index];
+
+                          // CARD ACTIVIDAD
+                          return CardActividad(
+
+                            actividad:
+                                actividad,
+
+                            onEditar: () {
+
+                              Navigator.push(
+
+                                context,
+
+                                MaterialPageRoute(
+
+                                  builder: (_) =>
+                                      PublicarActividad(
+
+                                    actividadEditar:
+                                        actividad,
+                                  ),
+                                ),
+                              );
+                            },
+
+                            onEliminar: () {
+
+                              confirmarEliminar(
+
+                                actividad[
+                                    'id_actividad'],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+        ],
+      ),
     );
   }
 }

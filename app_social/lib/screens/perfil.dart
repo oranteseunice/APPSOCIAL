@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 
+// IMPORTAR PANTALLAS
 import 'home.dart';
 import 'mis_horas.dart';
 import 'admin/estadisticas_admin.dart';
 import 'login.dart';
 
+// PANTALLA PERFIL
 class Perfil extends StatelessWidget {
 
+  // VARIABLES DEL USUARIO
   final String rol;
   final String nombre;
   final String correo;
 
   const Perfil({
+
     super.key,
+
     required this.rol,
     required this.nombre,
     required this.correo,
@@ -23,29 +28,38 @@ class Perfil extends StatelessWidget {
 
     return Scaffold(
 
+      // COLOR FONDO
       backgroundColor: const Color(0xFFF4F6FA),
 
+      // APPBAR
       appBar: AppBar(
 
-        backgroundColor: const Color(0xFF2E4A9E),
+        backgroundColor:
+            const Color(0xFF2E4A9E),
 
-        title: const Text('Mi perfil'),
+        title: const Text(
+          'Mi perfil',
+        ),
       ),
 
       body: SingleChildScrollView(
 
-        padding: const EdgeInsets.all(20),
+        padding:
+            const EdgeInsets.all(20),
 
         child: Column(
 
           children: [
 
-            const SizedBox(height: 10),
+            const SizedBox(
+              height: 10,
+            ),
 
-            // FOTO / LOGO
+            // LOGO PERFIL
             ClipOval(
 
               child: Image.asset(
+
                 'assets/logo.jpeg',
 
                 width: 130,
@@ -55,266 +69,160 @@ class Perfil extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(
+              height: 20,
+            ),
 
+            // NOMBRE USUARIO
             Text(
 
               nombre,
 
               style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+
+                fontSize: 28,
+
+                fontWeight:
+                    FontWeight.bold,
               ),
             ),
 
-            const SizedBox(height: 5),
+            const SizedBox(
+              height: 5,
+            ),
 
+            // ROL USUARIO
             Text(
 
-              rol,
+              rol.toUpperCase(),
 
               style: TextStyle(
-                color: Colors.grey.shade600,
+
+                color:
+                    Colors.grey.shade600,
+
                 fontSize: 16,
               ),
             ),
 
-            const SizedBox(height: 30),
-
-            // CORREO
-            Container(
-
-              padding: const EdgeInsets.all(18),
-
-              decoration: BoxDecoration(
-
-                color: Colors.white,
-
-                borderRadius:
-                    BorderRadius.circular(18),
-              ),
-
-              child: Row(
-
-                children: [
-
-                  const Icon(
-                    Icons.email,
-                    color: Color(0xFF2E4A9E),
-                  ),
-
-                  const SizedBox(width: 15),
-
-                  Expanded(
-
-                    child: Column(
-
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-
-                      children: [
-
-                        Text(
-
-                          'Correo',
-
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        Text(
-
-                          correo,
-
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            const SizedBox(
+              height: 30,
             ),
 
-            const SizedBox(height: 18),
+            // CARD CORREO
+            _buildInfoCard(
 
-            // PANEL
-            Container(
+              icon: Icons.email,
 
-              padding: const EdgeInsets.all(18),
+              titulo: 'Correo',
 
-              decoration: BoxDecoration(
-
-                color: Colors.white,
-
-                borderRadius:
-                    BorderRadius.circular(18),
-              ),
-
-              child: Row(
-
-                children: [
-
-                  const Icon(
-                    Icons.admin_panel_settings,
-                    color: Color(0xFF2E4A9E),
-                  ),
-
-                  const SizedBox(width: 15),
-
-                  Expanded(
-
-                    child: Column(
-
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-
-                      children: [
-
-                        Text(
-
-                          'Panel',
-
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        Text(
-
-                          rol == 'admin'
-                              ? 'Administrador'
-                              : 'Estudiante',
-
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              contenido: correo,
             ),
 
-            const SizedBox(height: 18),
-
-            // PERMISOS
-            Container(
-
-              padding: const EdgeInsets.all(18),
-
-              decoration: BoxDecoration(
-
-                color: Colors.white,
-
-                borderRadius:
-                    BorderRadius.circular(18),
-              ),
-
-              child: Row(
-
-                children: [
-
-                  const Icon(
-                    Icons.groups,
-                    color: Color(0xFF2E4A9E),
-                  ),
-
-                  const SizedBox(width: 15),
-
-                  Expanded(
-
-                    child: Column(
-
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-
-                      children: [
-
-                        Text(
-
-                          'Permisos',
-
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        Text(
-
-                          rol == 'admin'
-                              ? 'Control total del sistema'
-                              : 'Acceso a actividades',
-
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            const SizedBox(
+              height: 18,
             ),
 
-            const SizedBox(height: 30),
+            // CARD PANEL
+            _buildInfoCard(
+
+              icon:
+                  Icons.admin_panel_settings,
+
+              titulo: 'Panel',
+
+              contenido:
+
+                  rol == 'admin'
+                      ? 'Administrador'
+                      : 'Estudiante',
+            ),
+
+            const SizedBox(
+              height: 18,
+            ),
+
+            // CARD PERMISOS
+            _buildInfoCard(
+
+              icon: Icons.groups,
+
+              titulo: 'Permisos',
+
+              contenido:
+
+                  rol == 'admin'
+                      ? 'Control total del sistema'
+                      : 'Acceso a actividades',
+            ),
+
+            const SizedBox(
+              height: 35,
+            ),
 
             // BOTON CERRAR SESION
             SizedBox(
 
-              width: 220,
+              width: 230,
 
-              child: ElevatedButton.icon(
+              child:
+                  ElevatedButton.icon(
 
-                style: ElevatedButton.styleFrom(
+                style:
+                    ElevatedButton.styleFrom(
 
                   backgroundColor:
-                      const Color(0xFF2E4A9E),
-
-                  foregroundColor: Colors.yellow,
-
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 14,
+                      const Color(
+                    0xFF2E4A9E,
                   ),
 
-                  shape: RoundedRectangleBorder(
+                  foregroundColor:
+                      Colors.yellow,
+
+                  padding:
+                      const EdgeInsets.symmetric(
+                    vertical: 15,
+                  ),
+
+                  shape:
+                      RoundedRectangleBorder(
+
                     borderRadius:
-                        BorderRadius.circular(30),
+                        BorderRadius.circular(
+                      35,
+                    ),
                   ),
                 ),
 
                 onPressed: () {
 
+                  // REGRESAR LOGIN
                   Navigator.pushReplacement(
 
                     context,
 
                     MaterialPageRoute(
-                      builder: (_) => const Login(),
+
+                      builder: (_) =>
+                          const Login(),
                     ),
                   );
                 },
 
-                icon: const Icon(Icons.logout),
+                icon: const Icon(
+                  Icons.logout,
+                ),
 
                 label: const Text(
 
                   'Cerrar sesión',
 
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+
+                    fontWeight:
+                        FontWeight.bold,
+
+                    fontSize: 16,
                   ),
                 ),
               ),
@@ -323,13 +231,17 @@ class Perfil extends StatelessWidget {
         ),
       ),
 
-      // BOTTOM NAVIGATION
-      bottomNavigationBar: BottomNavigationBar(
+      // MENU INFERIOR
+      bottomNavigationBar:
+          BottomNavigationBar(
 
         currentIndex: 2,
 
         selectedItemColor:
             const Color(0xFF2E4A9E),
+
+        unselectedItemColor:
+            Colors.grey,
 
         onTap: (index) {
 
@@ -343,8 +255,11 @@ class Perfil extends StatelessWidget {
               MaterialPageRoute(
 
                 builder: (_) => Home(
+
                   rol: rol,
+
                   nombre: nombre,
+
                   correo: correo,
                 ),
               ),
@@ -376,11 +291,17 @@ class Perfil extends StatelessWidget {
 
         items: [
 
+          // INICIO
           const BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+
+            icon: Icon(
+              Icons.home,
+            ),
+
             label: 'Inicio',
           ),
 
+          // ESTADISTICAS O HORAS
           BottomNavigationBarItem(
 
             icon: Icon(
@@ -397,9 +318,141 @@ class Perfil extends StatelessWidget {
                     : 'Mis horas',
           ),
 
+          // PERFIL
           const BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+
+            icon: Icon(
+              Icons.person,
+            ),
+
             label: 'Perfil',
+          ),
+        ],
+      ),
+    );
+  }
+
+  // WIDGET CARD INFORMACION
+  Widget _buildInfoCard({
+
+    required IconData icon,
+
+    required String titulo,
+
+    required String contenido,
+  }) {
+
+    return Container(
+
+      padding:
+          const EdgeInsets.all(18),
+
+      decoration: BoxDecoration(
+
+        color: Colors.white,
+
+        borderRadius:
+            BorderRadius.circular(
+          20,
+        ),
+
+        boxShadow: [
+
+          BoxShadow(
+
+            color: Colors.black12,
+
+            blurRadius: 5,
+
+            offset:
+                const Offset(
+              0,
+              4,
+            ),
+          ),
+        ],
+      ),
+
+      child: Row(
+
+        children: [
+
+          // ICONO
+          Container(
+
+            padding:
+                const EdgeInsets.all(
+              12,
+            ),
+
+            decoration: BoxDecoration(
+
+              color: const Color(
+                0xFF2E4A9E,
+              ).withOpacity(0.1),
+
+              borderRadius:
+                  BorderRadius.circular(
+                14,
+              ),
+            ),
+
+            child: Icon(
+
+              icon,
+
+              color:
+                  const Color(
+                0xFF2E4A9E,
+              ),
+            ),
+          ),
+
+          const SizedBox(
+            width: 15,
+          ),
+
+          // TEXTOS
+          Expanded(
+
+            child: Column(
+
+              crossAxisAlignment:
+                  CrossAxisAlignment
+                      .start,
+
+              children: [
+
+                Text(
+
+                  titulo,
+
+                  style: TextStyle(
+
+                    color:
+                        Colors.grey.shade600,
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 5,
+                ),
+
+                Text(
+
+                  contenido,
+
+                  style:
+                      const TextStyle(
+
+                    fontSize: 18,
+
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

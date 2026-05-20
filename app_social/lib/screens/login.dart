@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+// IMPORTA EL BOTÓN PERSONALIZADO
 import '../botones/button.dart';
+
+// IMPORTA EL HOME
 import 'home.dart';
 
+// PANTALLA LOGIN
 class Login extends StatefulWidget {
+
   const Login({super.key});
 
   @override
@@ -12,14 +18,160 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
 
+  // CONTROLADORES DE LOS INPUTS
   final correoController = TextEditingController();
   final passwordController = TextEditingController();
 
+  // VARIABLE PARA MOSTRAR LOADING
+  bool cargando = false;
+
+  // LIBERAR MEMORIA
   @override
   void dispose() {
+
     correoController.dispose();
     passwordController.dispose();
+
     super.dispose();
+  }
+
+  // MÉTODO LOGIN
+  Future<void> iniciarSesion() async {
+
+    // EVITA MULTIPLES CLICKS
+    if (cargando) return;
+
+    // ACTIVA LOADING
+    setState(() {
+      cargando = true;
+    });
+
+    // INSTANCIA SUPABASE
+    final supabase = Supabase.instance.client;
+
+    // OBTENER DATOS INPUTS
+    final correo =
+        correoController.text
+            .trim()
+            .toLowerCase();
+
+    final password =
+        passwordController.text.trim();
+
+    // VALIDAR CAMPOS VACÍOS
+    if (correo.isEmpty || password.isEmpty) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+
+        const SnackBar(
+          content: Text(
+            'Completa todos los campos',
+          ),
+        ),
+      );
+
+      // DESACTIVA LOADING
+      setState(() {
+        cargando = false;
+      });
+
+      return;
+    }
+
+    try {
+
+      // BUSCAR USUARIO EN SUPABASE
+      final user = await supabase
+          .from('usuarios')
+          .select()
+          .eq('correo', correo)
+          .maybeSingle();
+
+      // DEBUG
+      print("USER: $user");
+
+      // VALIDAR SI USUARIO EXISTE
+      if (user == null) {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+
+          const SnackBar(
+            content: Text(
+              'Usuario no existe',
+            ),
+          ),
+        );
+
+        setState(() {
+          cargando = false;
+        });
+
+        return;
+      }
+
+      // VALIDAR CONTRASEÑA
+      if (user['password'] != password) {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+
+          const SnackBar(
+            content: Text(
+              'Contraseña incorrecta',
+            ),
+          ),
+        );
+
+        setState(() {
+          cargando = false;
+        });
+
+        return;
+      }
+
+      // DATOS DEL USUARIO
+      final rol =
+          user['rol'] ?? 'estudiante';
+
+      final nombre =
+          user['nombre'] ?? 'Usuario';
+
+      final correoDB =
+          user['correo'] ?? '';
+
+      // NAVEGAR AL HOME
+      Navigator.pushReplacement(
+
+        context,
+
+        MaterialPageRoute(
+
+          builder: (context) => Home(
+            rol: rol,
+            nombre: nombre,
+            correo: correoDB,
+          ),
+        ),
+      );
+
+    } catch (e) {
+
+      // MOSTRAR ERROR
+      ScaffoldMessenger.of(context).showSnackBar(
+
+        SnackBar(
+          content: Text(
+            'Error: $e',
+          ),
+        ),
+      );
+
+    } finally {
+
+      // DESACTIVAR LOADING
+      setState(() {
+        cargando = false;
+      });
+    }
   }
 
   @override
@@ -27,21 +179,27 @@ class _LoginState extends State<Login> {
 
     return Scaffold(
 
+      // COLOR FONDO
       backgroundColor: const Color(0xFFF5F6F8),
 
       body: ListView(
 
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding:
+            const EdgeInsets.symmetric(
+          horizontal: 20,
+        ),
 
         children: [
 
           const SizedBox(height: 40),
 
-          // LOGO CIRCULAR
+          // LOGO REDONDO
           Center(
+
             child: ClipOval(
 
               child: Image.asset(
+
                 'assets/logo.jpeg',
 
                 width: 220,
@@ -54,48 +212,64 @@ class _LoginState extends State<Login> {
 
           const SizedBox(height: 20),
 
-          // TITULO
+          // TÍTULO
           const Text(
+
             'UCAD Servicio Social',
 
             textAlign: TextAlign.center,
 
             style: TextStyle(
+
               fontSize: 26,
+
               fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 30, 58, 138),
+
+              color: Color.fromARGB(
+                255,
+                30,
+                58,
+                138,
+              ),
             ),
           ),
 
           const SizedBox(height: 30),
 
-          // CORREO
+          // INPUT CORREO
           TextField(
 
             controller: correoController,
 
             decoration: InputDecoration(
 
-              hintText: 'Correo electrónico',
+              hintText:
+                  'Correo electrónico',
 
               prefixIcon: const Icon(
+
                 Icons.email,
+
                 color: Color(0xFFF0B429),
               ),
 
               filled: true,
+
               fillColor: Colors.white,
 
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+
+                borderRadius:
+                    BorderRadius.circular(12),
               ),
             ),
           ),
 
           const SizedBox(height: 20),
 
-          // TEXTO PASSWORD
+          // LABEL PASSWORD
           const Text(
+
             'Contraseña',
 
             style: TextStyle(
@@ -105,10 +279,11 @@ class _LoginState extends State<Login> {
 
           const SizedBox(height: 8),
 
-          // PASSWORD
+          // INPUT PASSWORD
           TextField(
 
             controller: passwordController,
+
             obscureText: true,
 
             decoration: InputDecoration(
@@ -116,137 +291,40 @@ class _LoginState extends State<Login> {
               hintText: 'Contraseña',
 
               prefixIcon: const Icon(
+
                 Icons.lock,
+
                 color: Color(0xFFF0B429),
               ),
 
               filled: true,
+
               fillColor: Colors.white,
 
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+
+                borderRadius:
+                    BorderRadius.circular(12),
               ),
             ),
           ),
 
           const SizedBox(height: 30),
 
-          // BOTÓN LOGIN
-          BotonPrincipal(
+          // MOSTRAR LOADER O BOTÓN
+          cargando
 
-            texto: 'Iniciar sesión',
+              ? const Center(
+                  child:
+                      CircularProgressIndicator(),
+                )
 
-            onPressed: () async {
+              : BotonPrincipal(
 
-              final supabase =
-                  Supabase.instance.client;
+                  texto: 'Iniciar sesión',
 
-              final correo =
-                  correoController.text
-                      .trim()
-                      .toLowerCase();
-
-              final password =
-                  passwordController.text.trim();
-
-              // VALIDAR CAMPOS
-              if (correo.isEmpty || password.isEmpty) {
-
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(
-
-                  const SnackBar(
-                    content: Text(
-                      'Completa todos los campos',
-                    ),
-                  ),
-                );
-
-                return;
-              }
-
-              try {
-
-                // BUSCAR USUARIO
-                final user = await supabase
-                    .from('usuarios')
-                    .select()
-                    .eq('correo', correo)
-                    .maybeSingle();
-
-                print("USER: $user");
-
-                // SI NO EXISTE
-                if (user == null) {
-
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(
-
-                    const SnackBar(
-                      content: Text(
-                        'Usuario no existe',
-                      ),
-                    ),
-                  );
-
-                  return;
-                }
-
-                // VALIDAR PASSWORD
-                if (user['password'] != password) {
-
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(
-
-                    const SnackBar(
-                      content: Text(
-                        'Contraseña incorrecta',
-                      ),
-                    ),
-                  );
-
-                  return;
-                }
-
-                // DATOS
-                final rol =
-                    user['rol'] ?? 'estudiante';
-
-                final nombre =
-                    user['nombre'] ?? 'Usuario';
-
-                final correoDB =
-                    user['correo'] ?? '';
-
-                // IR AL HOME
-                Navigator.pushReplacement(
-
-                  context,
-
-                  MaterialPageRoute(
-
-                    builder: (context) => Home(
-                      rol: rol,
-                      nombre: nombre,
-                      correo: correoDB,
-                    ),
-                  ),
-                );
-
-              } catch (e) {
-
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(
-
-                  SnackBar(
-                    content: Text(
-                      'Error: $e',
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
+                  onPressed: iniciarSesion,
+                ),
 
           const SizedBox(height: 30),
         ],
