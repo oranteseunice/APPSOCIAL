@@ -177,7 +177,7 @@ class Perfil extends StatelessWidget {
                   ),
 
                   foregroundColor:
-                      Colors.yellow,
+                   const Color(0xFFFFC107),   
 
                   padding:
                       const EdgeInsets.symmetric(

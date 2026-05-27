@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // IMPORTAR WIDGET CARD
-import '../../widgets/cards_evidencias.dart';
+import '../../widgets/card_evidencias.dart';
 
 // PANTALLA PARA EVALUAR HORAS
 class EvaluarHoras extends StatefulWidget {

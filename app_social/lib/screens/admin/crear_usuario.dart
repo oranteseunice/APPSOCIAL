@@ -2,33 +2,72 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CrearUsuario extends StatefulWidget {
-  const CrearUsuario({super.key});
+
+  const CrearUsuario({
+    super.key,
+  });
 
   @override
-  State<CrearUsuario> createState() => _CrearUsuarioState();
+  State<CrearUsuario> createState() =>
+      _CrearUsuarioState();
 }
 
-class _CrearUsuarioState extends State<CrearUsuario> {
+class _CrearUsuarioState
+    extends State<CrearUsuario> {
 
-  final supabase = Supabase.instance.client;
+  // INSTANCIA SUPABASE
+  final supabase =
+      Supabase.instance.client;
 
-  final nombreController = TextEditingController();
-  final correoController = TextEditingController();
-  final passwordController = TextEditingController();
+  // CONTROLADORES
+  final nombreController =
+      TextEditingController();
 
-  String rolSeleccionado = 'estudiante';
+  final correoController =
+      TextEditingController();
 
+  final passwordController =
+      TextEditingController();
+
+  // ROL DEFAULT
+  String rolSeleccionado =
+      'estudiante';
+
+  // MÉTODO CREAR USUARIO
   Future<void> crearUsuario() async {
 
-    final nombre = nombreController.text.trim();
-    final correo = correoController.text.trim().toLowerCase();
-    final password = passwordController.text.trim();
+    // OBTENER DATOS
+    final nombre =
+        nombreController.text.trim();
 
-    if (nombre.isEmpty || correo.isEmpty || password.isEmpty) {
+    final correo =
+        correoController.text
+            .trim()
+            .toLowerCase();
 
-      ScaffoldMessenger.of(context).showSnackBar(
+    final password =
+        passwordController.text.trim();
+
+    // VALIDAR CAMPOS
+    if (
+
+      nombre.isEmpty ||
+
+      correo.isEmpty ||
+
+      password.isEmpty
+
+    ) {
+
+      ScaffoldMessenger.of(context)
+
+          .showSnackBar(
+
         const SnackBar(
-          content: Text("Completa todos los campos"),
+
+          content: Text(
+            "Completa todos los campos",
+          ),
         ),
       );
 
@@ -37,134 +76,309 @@ class _CrearUsuarioState extends State<CrearUsuario> {
 
     try {
 
-      await supabase.from('usuarios').insert({
-        'nombre': nombre,
-        'correo': correo,
-        'password': password,
-        'rol': rolSeleccionado,
+      // REGISTRO REAL EN AUTH
+      final response =
+          await supabase.auth.signUp(
+
+        email: correo,
+
+        password: password,
+      );
+
+      // OBTENER USER AUTH
+      final authUser =
+          response.user;
+
+      // VALIDAR USER
+      if (authUser == null) {
+
+        ScaffoldMessenger.of(context)
+
+            .showSnackBar(
+
+          const SnackBar(
+
+            content: Text(
+              "No se pudo crear el usuario",
+            ),
+          ),
+        );
+
+        return;
+      }
+
+      // GUARDAR EN TABLA USUARIOS
+      await supabase
+          .from('usuarios')
+          .insert({
+
+        'id_auth':
+            authUser.id,
+
+        'nombre':
+            nombre,
+
+        'correo':
+            correo,
+
+        'password':
+            password,
+
+        'rol':
+            rolSeleccionado,
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      // MENSAJE ÉXITO
+      ScaffoldMessenger.of(context)
+
+          .showSnackBar(
+
         const SnackBar(
-          content: Text("Usuario creado correctamente"),
+
+          content: Text(
+            "Usuario creado correctamente",
+          ),
         ),
       );
 
+      // LIMPIAR CAMPOS
+      nombreController.clear();
+
+      correoController.clear();
+
+      passwordController.clear();
+
+      // REGRESAR
       Navigator.pop(context);
+
+    } on AuthException catch (e) {
+
+      ScaffoldMessenger.of(context)
+
+          .showSnackBar(
+
+        SnackBar(
+
+          content: Text(
+            e.message,
+          ),
+        ),
+      );
 
     } catch (e) {
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+
+          .showSnackBar(
+
         SnackBar(
-          content: Text("Error: $e"),
+
+          content: Text(
+            "Error: $e",
+          ),
         ),
       );
-
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
 
-      backgroundColor: const Color(0xFFF4F6FA),
+      backgroundColor:
+          const Color(0xFFF4F6FA),
 
+      // APPBAR
       appBar: AppBar(
-        title: const Text("Crear usuario"),
-        backgroundColor: const Color(0xFF2E4A9E),
+
+        title: const Text(
+          "Crear usuario",
+        ),
+
+        backgroundColor:
+            const Color(0xFF2E4A9E),
       ),
 
+      // BODY
       body: Padding(
-        padding: const EdgeInsets.all(20),
+
+        padding:
+            const EdgeInsets.all(20),
 
         child: SingleChildScrollView(
+
           child: Column(
+
             children: [
 
+              // INPUT NOMBRE
               TextField(
-                controller: nombreController,
-                decoration: InputDecoration(
-                  labelText: "Nombre",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+
+                controller:
+                    nombreController,
+
+                decoration:
+                    InputDecoration(
+
+                  labelText:
+                      "Nombre",
+
+                  border:
+                      OutlineInputBorder(
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      12,
+                    ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 15),
+              const SizedBox(
+                height: 15,
+              ),
 
+              // INPUT CORREO
               TextField(
-                controller: correoController,
-                decoration: InputDecoration(
-                  labelText: "Correo",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+
+                controller:
+                    correoController,
+
+                decoration:
+                    InputDecoration(
+
+                  labelText:
+                      "Correo",
+
+                  border:
+                      OutlineInputBorder(
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      12,
+                    ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 15),
+              const SizedBox(
+                height: 15,
+              ),
 
+              // INPUT PASSWORD
               TextField(
-                controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: "Contraseña",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+
+                controller:
+                    passwordController,
+
                 obscureText: true,
+
+                decoration:
+                    InputDecoration(
+
+                  labelText:
+                      "Contraseña",
+
+                  border:
+                      OutlineInputBorder(
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      12,
+                    ),
+                  ),
+                ),
               ),
 
-              const SizedBox(height: 15),
+              const SizedBox(
+                height: 15,
+              ),
 
+              // DROPDOWN ROL
               DropdownButtonFormField(
-                value: rolSeleccionado,
+
+                value:
+                    rolSeleccionado,
 
                 items: const [
 
                   DropdownMenuItem(
+
                     value: 'admin',
-                    child: Text('admin'),
+
+                    child: Text(
+                      'admin',
+                    ),
                   ),
 
                   DropdownMenuItem(
-                    value: 'estudiante',
-                    child: Text('estudiante'),
-                  ),
 
+                    value:
+                        'estudiante',
+
+                    child: Text(
+                      'estudiante',
+                    ),
+                  ),
                 ],
 
                 onChanged: (value) {
+
                   setState(() {
-                    rolSeleccionado = value!;
+
+                    rolSeleccionado =
+                        value!;
                   });
                 },
 
-                decoration: InputDecoration(
-                  labelText: "Rol",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                decoration:
+                    InputDecoration(
+
+                  labelText:
+                      "Rol",
+
+                  border:
+                      OutlineInputBorder(
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      12,
+                    ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(
+                height: 30,
+              ),
 
+              // BOTÓN GUARDAR
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2E4A9E),
-                  padding: const EdgeInsets.symmetric(
+
+                style:
+                    ElevatedButton.styleFrom(
+
+                  backgroundColor:
+                      const Color(
+                    0xFF2E4A9E,
+                  ),
+
+                  padding:
+                      const EdgeInsets.symmetric(
+
                     horizontal: 40,
                     vertical: 15,
                   ),
                 ),
 
-                onPressed: crearUsuario,
+                onPressed:
+                    crearUsuario,
 
-                child: const Text("Guardar"),
+                child: const Text(
+                  "Guardar",
+                ),
               ),
-
             ],
           ),
         ),

@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// IMPORTAR PANTALLAS
+
 import '../home.dart';
 import '../perfil.dart';
 
-// IMPORTAR CARD
+import 'evaluar_horas.dart';
+import 'proyeccion_social.dart';
+import 'publicar_actividad.dart';
+import 'ver_inscritos.dart';
+
+// IMPORTAR WIDGETS
+
 import '../../widgets/card_estadistica.dart';
+import '../../widgets/card_accion.dart';
+import '../../widgets/card_estado.dart';
 
-// PANTALLA ESTADÍSTICAS
 class EstadisticasAdmin extends StatefulWidget {
-
-  const EstadisticasAdmin({
-    super.key,
-  });
+  const EstadisticasAdmin({super.key});
 
   @override
   State<EstadisticasAdmin> createState() =>
@@ -22,68 +28,95 @@ class EstadisticasAdmin extends StatefulWidget {
 class _EstadisticasAdminState
     extends State<EstadisticasAdmin> {
 
-  // INSTANCIA SUPABASE
   final supabase =
       Supabase.instance.client;
 
-  // VARIABLES ESTADÍSTICAS
-  int totalEstudiantes = 0;
+  // VARIABLES
 
+  int totalInscritos = 0;
   int totalActividades = 0;
-
-  int horasAprobadas = 0;
-
+  int aprobadas = 0;
   int pendientes = 0;
 
-  // LOADING
+  double porcentajeAprobado = 0;
+
   bool cargando = true;
+
+  // INIT
 
   @override
   void initState() {
-
     super.initState();
 
     cargarEstadisticas();
   }
 
-  // CARGAR DATOS
+  // CARGAR ESTADISTICAS
+
   Future<void> cargarEstadisticas() async {
 
     try {
 
-      // TOTAL ESTUDIANTES
-      final estudiantes = await supabase
-          .from('usuarios')
-          .select()
-          .eq('rol', 'estudiante');
+      // INSCRITOS
+      final inscritosDB =
+          await supabase
+              .from('inscritos')
+              .select();
 
-      // TOTAL ACTIVIDADES
-      final actividades = await supabase
-          .from('actividades')
-          .select();
+      // ACTIVIDADES
+      final actividadesDB =
+          await supabase
+              .from('actividades')
+              .select();
 
       // APROBADAS
-      final aprobadas = await supabase
-          .from('evidencias')
-          .select()
-          .eq('estado', 'aprobado');
+      final aprobadasDB =
+          await supabase
+              .from('evidencias')
+              .select()
+              .eq(
+                'estado',
+                'aprobado',
+              );
 
       // PENDIENTES
-      final pendientesDB = await supabase
-          .from('evidencias')
-          .select()
-          .eq('estado', 'pendiente');
+      final pendientesDB =
+          await supabase
+              .from('evidencias')
+              .select()
+              .eq(
+                'estado',
+                'pendiente',
+              );
 
+      // TOTAL EVIDENCIAS
+      int total =
+
+          (aprobadasDB as List)
+              .length +
+
+          (pendientesDB as List)
+              .length;
+
+      // PORCENTAJE
+      porcentajeAprobado =
+          total == 0
+              ? 0
+              : (aprobadasDB as List)
+                      .length /
+                  total;
+
+      // ACTUALIZAR UI
       setState(() {
 
-        totalEstudiantes =
-            estudiantes.length;
+        totalInscritos =
+            inscritosDB.length;
 
         totalActividades =
-            actividades.length;
+            actividadesDB.length;
 
-        horasAprobadas =
-            aprobadas.length;
+        aprobadas =
+            aprobadasDB.length;
 
         pendientes =
             pendientesDB.length;
@@ -93,19 +126,40 @@ class _EstadisticasAdminState
 
     } catch (e) {
 
-      ScaffoldMessenger.of(context)
+      setState(() {
+        cargando = false;
+      });
 
-          .showSnackBar(
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(
 
         SnackBar(
-
-          content: Text(
-            'Error: $e',
-          ),
+          content:
+              Text('Error: $e'),
         ),
       );
     }
   }
+
+  // ABRIR PANTALLAS
+
+  void abrirPantalla(
+    Widget pantalla,
+  ) {
+
+    Navigator.push(
+
+      context,
+
+      MaterialPageRoute(
+        builder: (_) =>
+            pantalla,
+      ),
+    );
+  }
+
+  // BUILD
 
   @override
   Widget build(BuildContext context) {
@@ -113,29 +167,35 @@ class _EstadisticasAdminState
     return Scaffold(
 
       backgroundColor:
-          const Color(0xFFF4F6FA),
+          const Color(
+        0xFFF4F6FA,
+      ),
 
       // APPBAR
+
       appBar: AppBar(
 
         backgroundColor:
-            const Color(0xFF2E4A9E),
+            const Color(
+          0xFF2E4A9E,
+        ),
 
         title: const Text(
-          "Estadísticas",
+          'Estadísticas',
         ),
+
+        centerTitle: true,
       ),
+
+      // BODY
 
       body: cargando
 
-          // LOADING
           ? const Center(
-
               child:
                   CircularProgressIndicator(),
             )
 
-          // CONTENIDO
           : SingleChildScrollView(
 
               padding:
@@ -146,130 +206,16 @@ class _EstadisticasAdminState
               child: Column(
 
                 crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    CrossAxisAlignment
+                        .start,
 
                 children: [
 
                   // TITULO
+
                   const Text(
 
-                    "Resumen general",
-
-                    style: TextStyle(
-
-                      fontSize: 24,
-
-                      fontWeight:
-                          FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(
-                    height: 20,
-                  ),
-
-                  // FILA 1
-                  Row(
-
-                    children: [
-
-                      Expanded(
-
-                        child:
-                            CardEstadistica(
-
-                          icon:
-                              Icons.people,
-
-                          titulo:
-                              "Estudiantes",
-
-                          valor:
-                              totalEstudiantes
-                                  .toString(),
-                        ),
-                      ),
-
-                      const SizedBox(
-                        width: 15,
-                      ),
-
-                      Expanded(
-
-                        child:
-                            CardEstadistica(
-
-                          icon:
-                              Icons.assignment,
-
-                          titulo:
-                              "Actividades",
-
-                          valor:
-                              totalActividades
-                                  .toString(),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(
-                    height: 15,
-                  ),
-
-                  // FILA 2
-                  Row(
-
-                    children: [
-
-                      Expanded(
-
-                        child:
-                            CardEstadistica(
-
-                          icon:
-                              Icons.check_circle,
-
-                          titulo:
-                              "Aprobadas",
-
-                          valor:
-                              horasAprobadas
-                                  .toString(),
-                        ),
-                      ),
-
-                      const SizedBox(
-                        width: 15,
-                      ),
-
-                      Expanded(
-
-                        child:
-                            CardEstadistica(
-
-                          icon:
-                              Icons.pending,
-
-                          titulo:
-                              "Pendientes",
-
-                          valor:
-                              pendientes
-                                  .toString(),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(
-                    height: 30,
-                  ),
-
-                  // TITULO
-                  const Text(
-
-                    "Panel administrativo",
+                    'Resumen general',
 
                     style: TextStyle(
 
@@ -284,127 +230,327 @@ class _EstadisticasAdminState
                     height: 20,
                   ),
 
-                  // TARJETA
-                  _buildActividad(
+                  // GRID ESTADISTICAS
+
+                  GridView.count(
+
+                    shrinkWrap: true,
+
+                    physics:
+                        const NeverScrollableScrollPhysics(),
+
+                    crossAxisCount: 2,
+
+                    mainAxisSpacing: 16,
+
+                    crossAxisSpacing: 16,
+
+                    childAspectRatio: 1.1,
+
+                    children: [
+
+                      // INSCRITOS
+                      CardEstadistica(
+
+                        icon:
+                            Icons.people,
+
+                        titulo:
+                            'Inscritos',
+
+                        valor:
+                            '$totalInscritos',
+
+                        onTap: () {
+
+                          abrirPantalla(
+                            const VerInscritos(),
+                          );
+                        },
+                      ),
+
+                      // ACTIVIDADES
+                      CardEstadistica(
+
+                        icon: Icons
+                            .assignment,
+
+                        titulo:
+                            'Actividades',
+
+                        valor:
+                            '$totalActividades',
+
+                        onTap: () {
+
+                          abrirPantalla(
+                            const ProyeccionSocial(),
+                          );
+                        },
+                      ),
+
+                      // APROBADAS
+                      CardEstadistica(
+
+                        icon: Icons
+                            .check_circle,
+
+                        titulo:
+                            'Aprobadas',
+
+                        valor:
+                            '$aprobadas',
+
+                        onTap: () {
+
+                          abrirPantalla(
+                            const EvaluarHoras(),
+                          );
+                        },
+                      ),
+
+                      // PENDIENTES
+                      CardEstadistica(
+
+                        icon:
+                            Icons.pending,
+
+                        titulo:
+                            'Pendientes',
+
+                        valor:
+                            '$pendientes',
+
+                        onTap: () {
+
+                          abrirPantalla(
+                            const EvaluarHoras(),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(
+                    height: 30,
+                  ),
+
+                  // PROGRESO
+
+                  Container(
+
+                    padding:
+                        const EdgeInsets
+                            .all(20),
+
+                    decoration:
+                        BoxDecoration(
+
+                      color:
+                          Colors.white,
+
+                      borderRadius:
+                          BorderRadius
+                              .circular(
+                        20,
+                      ),
+
+                      boxShadow: [
+
+                        BoxShadow(
+
+                          color: Colors
+                              .black12,
+
+                          blurRadius:
+                              6,
+
+                          offset:
+                              const Offset(
+                            0,
+                            4,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    child: Column(
+
+                      crossAxisAlignment:
+                          CrossAxisAlignment
+                              .start,
+
+                      children: [
+
+                        const Text(
+
+                          'Progreso de aprobación',
+
+                          style:
+                              TextStyle(
+
+                            fontSize:
+                                20,
+
+                            fontWeight:
+                                FontWeight
+                                    .bold,
+                          ),
+                        ),
+
+                        const SizedBox(
+                          height: 20,
+                        ),
+
+                        LinearProgressIndicator(
+
+                          value:
+                              porcentajeAprobado,
+
+                          minHeight:
+                              14,
+
+                          borderRadius:
+                              BorderRadius
+                                  .circular(
+                            20,
+                          ),
+
+                          backgroundColor:
+                              Colors.grey
+                                  .shade300,
+
+                          color:
+                              const Color(
+                            0xFF2E4A9E,
+                          ),
+                        ),
+
+                        const SizedBox(
+                          height: 15,
+                        ),
+
+                        Text(
+
+                          '${(porcentajeAprobado * 100).toStringAsFixed(0)}% de evidencias aprobadas',
+
+                          style:
+                              const TextStyle(
+
+                            fontWeight:
+                                FontWeight
+                                    .w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 30,
+                  ),
+
+                  // PANEL ADMIN
+
+                  const Text(
+
+                    'Panel administrativo',
+
+                    style: TextStyle(
+
+                      fontSize: 20,
+
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 20,
+                  ),
+
+                  // PUBLICAR ACTIVIDAD
+                  _buildAccion(
 
                     icon:
-                        Icons.analytics,
+                        Icons.add_box,
 
                     titulo:
-                        "Sistema conectado",
+                        'Publicar actividad',
 
                     subtitulo:
-                        "Supabase funcionando correctamente",
+                        'Crear nuevas actividades',
+
+                    onTap: () {
+
+                      abrirPantalla(
+                        const PublicarActividad(),
+                      );
+                    },
                   ),
 
                   const SizedBox(
                     height: 15,
                   ),
 
-                  _buildActividad(
+                  // EVALUAR
+                  _buildAccion(
 
-                    icon:
-                        Icons.verified,
+                    icon: Icons
+                        .fact_check,
 
                     titulo:
-                        "CRUD activo",
+                        'Evaluar evidencias',
 
                     subtitulo:
-                        "Actividades sincronizadas",
+                        'Aprobar o rechazar horas',
+
+                    onTap: () {
+
+                      abrirPantalla(
+                        const EvaluarHoras(),
+                      );
+                    },
                   ),
 
                   const SizedBox(
                     height: 15,
                   ),
 
-                  _buildActividad(
+                  // PROYECCION
+                  _buildAccion(
 
                     icon:
-                        Icons.people_alt,
+                        Icons.school,
 
                     titulo:
-                        "Usuarios registrados",
+                        'Proyección social',
 
                     subtitulo:
-                        "$totalEstudiantes estudiantes activos",
+                        'Gestionar actividades sociales',
+
+                    onTap: () {
+
+                      abrirPantalla(
+                        const ProyeccionSocial(),
+                      );
+                    },
                   ),
                 ],
               ),
             ),
 
-      // BOTTOM NAVIGATION
+      // MENU INFERIOR
+
       bottomNavigationBar:
           BottomNavigationBar(
 
-        selectedItemColor:
-            const Color(0xFF2E4A9E),
-
-        unselectedItemColor:
-            Colors.grey,
-
         currentIndex: 1,
 
-        onTap: (index) {
-
-          // INICIO
-          if (index == 0) {
-
-            Navigator.pushReplacement(
-
-              context,
-
-              MaterialPageRoute(
-
-                builder: (context) =>
-                    Home(
-
-                  rol: 'admin',
-
-                  nombre: 'Admin',
-
-                  correo: '',
-                ),
-              ),
-            );
-          }
-
-          // ESTADÍSTICAS
-          if (index == 1) {
-
-            Navigator.pushReplacement(
-
-              context,
-
-              MaterialPageRoute(
-
-                builder: (context) =>
-                    const EstadisticasAdmin(),
-              ),
-            );
-          }
-
-          // PERFIL
-          if (index == 2) {
-
-            Navigator.pushReplacement(
-
-              context,
-
-              MaterialPageRoute(
-
-                builder: (context) =>
-                    Perfil(
-
-                  rol: 'admin',
-
-                  nombre: 'Admin',
-
-                  correo: '',
-                ),
-              ),
-            );
-          }
-        },
+        selectedItemColor:
+            const Color(
+          0xFF2E4A9E,
+        ),
 
         items: const [
 
@@ -419,8 +565,9 @@ class _EstadisticasAdminState
 
           BottomNavigationBarItem(
 
-            icon:
-                Icon(Icons.bar_chart),
+            icon: Icon(
+              Icons.bar_chart,
+            ),
 
             label:
                 'Estadísticas',
@@ -428,112 +575,188 @@ class _EstadisticasAdminState
 
           BottomNavigationBarItem(
 
-            icon:
-                Icon(Icons.person),
+            icon: Icon(
+              Icons.person,
+            ),
 
             label: 'Perfil',
           ),
         ],
+
+        onTap: (index) {
+
+          // INICIO
+          if (index == 0) {
+
+            Navigator.pushReplacement(
+
+              context,
+
+              MaterialPageRoute(
+
+                builder: (_) =>
+                    Home(
+
+                  rol: 'admin',
+
+                  nombre:
+                      'Admin',
+
+                  correo:
+                      'admin@gmail.com',
+                ),
+              ),
+            );
+          }
+
+          // PERFIL
+          if (index == 2) {
+
+            Navigator.pushReplacement(
+
+              context,
+
+              MaterialPageRoute(
+
+                builder: (_) =>
+                    Perfil(
+
+                  rol: 'admin',
+
+                  nombre:
+                      'Admin',
+
+                  correo:
+                      'admin@gmail.com',
+                ),
+              ),
+            );
+          }
+        },
       ),
     );
   }
 
-  // TARJETAS INFERIORES
-  Widget _buildActividad({
+  // CARD ACCIONES
+
+  Widget _buildAccion({
 
     required IconData icon,
 
     required String titulo,
 
     required String subtitulo,
+
+    required VoidCallback onTap,
   }) {
 
-    return Container(
+    return GestureDetector(
 
-      padding:
-          const EdgeInsets.all(18),
+      onTap: onTap,
 
-      decoration: BoxDecoration(
+      child: Container(
 
-        color:
-            const Color(0xFF2E4A9E),
-
-        borderRadius:
-            BorderRadius.circular(
+        padding:
+            const EdgeInsets.all(
           18,
         ),
-      ),
 
-      child: Row(
+        decoration:
+            BoxDecoration(
 
-        children: [
+          color:
+              const Color(
+            0xFF2E4A9E,
+          ),
 
-          CircleAvatar(
+          borderRadius:
+              BorderRadius.circular(
+            18,
+          ),
+        ),
 
-            backgroundColor:
-                Colors.white24,
+        child: Row(
 
-            child: Icon(
+          children: [
 
-              icon,
+            CircleAvatar(
 
-              color:
-                  const Color(
-                0xFFFFC107,
+              backgroundColor:
+                  Colors.white24,
+
+              child: Icon(
+
+                icon,
+
+                color:
+                    const Color(
+                  0xFFFFC107,
+                ),
               ),
             ),
-          ),
 
-          const SizedBox(
-            width: 15,
-          ),
-
-          Expanded(
-
-            child: Column(
-
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
-
-              children: [
-
-                Text(
-
-                  titulo,
-
-                  style:
-                      const TextStyle(
-
-                    color:
-                        Colors.white,
-
-                    fontWeight:
-                        FontWeight.bold,
-
-                    fontSize: 16,
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 4,
-                ),
-
-                Text(
-
-                  subtitulo,
-
-                  style:
-                      const TextStyle(
-
-                    color:
-                        Colors.white70,
-                  ),
-                ),
-              ],
+            const SizedBox(
+              width: 15,
             ),
-          ),
-        ],
+
+            Expanded(
+
+              child: Column(
+
+                crossAxisAlignment:
+                    CrossAxisAlignment
+                        .start,
+
+                children: [
+
+                  Text(
+
+                    titulo,
+
+                    style:
+                        const TextStyle(
+
+                      color:
+                          Colors.white,
+
+                      fontWeight:
+                          FontWeight.bold,
+
+                      fontSize: 16,
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 4,
+                  ),
+
+                  Text(
+
+                    subtitulo,
+
+                    style:
+                        const TextStyle(
+
+                      color:
+                          Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const Icon(
+
+              Icons
+                  .arrow_forward_ios,
+
+              color:
+                  Colors.white70,
+
+              size: 18,
+            ),
+          ],
+        ),
       ),
     );
   }

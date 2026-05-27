@@ -70,7 +70,6 @@ class _LoginState extends State<Login> {
         ),
       );
 
-      // DESACTIVA LOADING
       setState(() {
         cargando = false;
       });
@@ -80,24 +79,29 @@ class _LoginState extends State<Login> {
 
     try {
 
-      // BUSCAR USUARIO EN SUPABASE
+      // LOGIN REAL SUPABASE AUTH
+      await supabase.auth.signInWithPassword(
+
+        email: correo,
+        password: password,
+      );
+
+      // BUSCAR DATOS EN TABLA USUARIOS
       final user = await supabase
           .from('usuarios')
           .select()
           .eq('correo', correo)
           .maybeSingle();
 
-      // DEBUG
-      print("USER: $user");
-
-      // VALIDAR SI USUARIO EXISTE
+      // VALIDAR SI EXISTE
       if (user == null) {
 
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
 
           const SnackBar(
             content: Text(
-              'Usuario no existe',
+              'Usuario no encontrado',
             ),
           ),
         );
@@ -109,26 +113,7 @@ class _LoginState extends State<Login> {
         return;
       }
 
-      // VALIDAR CONTRASEÑA
-      if (user['password'] != password) {
-
-        ScaffoldMessenger.of(context).showSnackBar(
-
-          const SnackBar(
-            content: Text(
-              'Contraseña incorrecta',
-            ),
-          ),
-        );
-
-        setState(() {
-          cargando = false;
-        });
-
-        return;
-      }
-
-      // DATOS DEL USUARIO
+      // DATOS USUARIO
       final rol =
           user['rol'] ?? 'estudiante';
 
@@ -138,7 +123,10 @@ class _LoginState extends State<Login> {
       final correoDB =
           user['correo'] ?? '';
 
-      // NAVEGAR AL HOME
+      // DEBUG
+      print("USER: $user");
+
+      // NAVEGAR HOME
       Navigator.pushReplacement(
 
         context,
@@ -146,6 +134,7 @@ class _LoginState extends State<Login> {
         MaterialPageRoute(
 
           builder: (context) => Home(
+
             rol: rol,
             nombre: nombre,
             correo: correoDB,
@@ -153,10 +142,22 @@ class _LoginState extends State<Login> {
         ),
       );
 
+    } on AuthException catch (e) {
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        SnackBar(
+          content: Text(
+            e.message,
+          ),
+        ),
+      );
+
     } catch (e) {
 
-      // MOSTRAR ERROR
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
 
         SnackBar(
           content: Text(

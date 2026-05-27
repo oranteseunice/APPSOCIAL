@@ -7,6 +7,10 @@ class CardEstadistica extends StatelessWidget {
   final String titulo;
   final String valor;
 
+  // NUEVO:
+  // FUNCION PARA HACER CLICK
+  final VoidCallback? onTap;
+
   const CardEstadistica({
 
     super.key,
@@ -14,82 +18,101 @@ class CardEstadistica extends StatelessWidget {
     required this.icon,
     required this.titulo,
     required this.valor,
+
+    // NUEVO
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
 
-    return Container(
+    return GestureDetector(
 
-      padding:
-          const EdgeInsets.all(20),
+      // ACCION AL TOCAR TARJETA
+      onTap: onTap,
 
-      decoration: BoxDecoration(
+      child: AnimatedContainer(
 
-        color: Colors.white,
+        duration: const Duration(
+          milliseconds: 200,
+        ),
 
-        borderRadius:
-            BorderRadius.circular(20),
+        padding:
+            const EdgeInsets.all(20),
 
-        boxShadow: [
+        decoration: BoxDecoration(
 
-          BoxShadow(
+          color: Colors.white,
 
-            color: Colors.black12,
+          borderRadius:
+              BorderRadius.circular(20),
 
-            blurRadius: 6,
+          boxShadow: [
 
-            offset: const Offset(
-              0,
-              4,
+            BoxShadow(
+
+              color: Colors.black12,
+
+              blurRadius: 6,
+
+              offset: const Offset(
+                0,
+                4,
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
 
-      child: Column(
+        child: Column(
 
-        children: [
+          mainAxisAlignment:
+              MainAxisAlignment.center,
 
-          Icon(
+          children: [
 
-            icon,
+            // ICONO
+            Icon(
 
-            size: 40,
+              icon,
 
-            color:
-                const Color(0xFF2E4A9E),
-          ),
+              size: 40,
 
-          const SizedBox(
-            height: 10,
-          ),
-
-          Text(
-
-            valor,
-
-            style: const TextStyle(
-
-              fontSize: 28,
-
-              fontWeight:
-                  FontWeight.bold,
+              color:
+                  const Color(0xFF2E4A9E),
             ),
-          ),
 
-          const SizedBox(
-            height: 5,
-          ),
+            const SizedBox(
+              height: 10,
+            ),
 
-          Text(
+            // VALOR
+            Text(
 
-            titulo,
+              valor,
 
-            textAlign:
-                TextAlign.center,
-          ),
-        ],
+              style: const TextStyle(
+
+                fontSize: 28,
+
+                fontWeight:
+                    FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(
+              height: 5,
+            ),
+
+            // TITULO
+            Text(
+
+              titulo,
+
+              textAlign:
+                  TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
