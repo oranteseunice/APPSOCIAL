@@ -61,7 +61,8 @@ class CardEstado extends StatelessWidget {
 
             backgroundColor:
                 const Color(
-                    0xFF2E4A9E),
+              0xFF2E4A9E,
+            ),
 
             child: Icon(
 

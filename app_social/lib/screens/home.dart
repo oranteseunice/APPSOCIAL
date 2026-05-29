@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // IMPORTAR PANTALLAS ESTUDIANTE
 import 'mis_horas.dart';
@@ -15,14 +16,12 @@ import 'admin/gestion_act.dart';
 
 // PANTALLA PRINCIPAL HOME
 class Home extends StatelessWidget {
-
   // VARIABLES USUARIO
   final String rol;
   final String nombre;
   final String correo;
 
   const Home({
-
     super.key,
 
     required this.rol,
@@ -32,43 +31,37 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       // COLOR FONDO
-      backgroundColor:
-          const Color(0xFFF4F6FA),
+      backgroundColor: const Color(0xFFF4F6FA),
 
       // APPBAR
       appBar: AppBar(
+        backgroundColor: const Color(0xFF2E4A9E),
 
-        backgroundColor:
-            const Color(0xFF2E4A9E),
+        centerTitle: true,
 
         title: Text(
-
           'Bienvenido $nombre',
+
+          style: GoogleFonts.poppins(
+            color: const Color(0xFFFFC107),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
 
       body: SingleChildScrollView(
-
-        padding:
-            const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
 
         child: Column(
-
           children: [
-
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
 
             // LOGO PRINCIPAL
             ClipOval(
-
               child: Image.asset(
-
                 'assets/logo.jpeg',
 
                 width: 130,
@@ -78,38 +71,25 @@ class Home extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(
-              height: 30,
-            ),
+            const SizedBox(height: 30),
 
             // =========================
             // PANEL ESTUDIANTE
             // =========================
-
             if (rol != 'admin') ...[
-
               // VER ACTIVIDADES
               GestureDetector(
-
                 onTap: () {
-
                   Navigator.push(
-
                     context,
 
                     MaterialPageRoute(
-
-                      builder: (context) =>
-                          VerActividades(
-
-                        rol: rol,
-                      ),
+                      builder: (context) => VerActividades(rol: rol),
                     ),
                   );
                 },
 
                 child: _buildCard(
-
                   Icons.search,
 
                   'Ver actividades',
@@ -118,32 +98,19 @@ class Home extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
 
               // MIS HORAS
               GestureDetector(
-
                 onTap: () {
-
                   Navigator.push(
-
                     context,
 
-                    MaterialPageRoute(
-
-                      builder: (context) =>
-                          MisHoras(
-
-                        rol: rol,
-                      ),
-                    ),
+                    MaterialPageRoute(builder: (context) => MisHoras(rol: rol)),
                   );
                 },
 
                 child: _buildCard(
-
                   Icons.access_time,
 
                   'Mis horas',
@@ -152,32 +119,21 @@ class Home extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
 
               // REGISTRAR ACTIVIDAD
               GestureDetector(
-
                 onTap: () {
-
                   Navigator.push(
-
                     context,
 
                     MaterialPageRoute(
-
-                      builder: (context) =>
-                          RegistrarActividad(
-
-                        rol: rol,
-                      ),
+                      builder: (context) => RegistrarActividad(rol: rol),
                     ),
                   );
                 },
 
                 child: _buildCard(
-
                   Icons.add_circle,
 
                   'Registrar actividad',
@@ -190,78 +146,49 @@ class Home extends StatelessWidget {
             // =========================
             // PANEL ADMINISTRADOR
             // =========================
-
             if (rol == 'admin') ...[
-
               // MENSAJE ADMIN
               Container(
-
                 width: double.infinity,
 
-                padding:
-                    const EdgeInsets.all(
-                  16,
-                ),
+                padding: const EdgeInsets.all(16),
 
                 decoration: BoxDecoration(
+                  color: Colors.orange.shade200,
 
-                  color:
-                      Colors.orange.shade200,
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    16,
-                  ),
+                  borderRadius: BorderRadius.circular(16),
                 ),
 
                 child: const Row(
-
                   children: [
+                    Icon(Icons.admin_panel_settings),
 
-                    Icon(
-                      Icons.admin_panel_settings,
-                    ),
-
-                    SizedBox(
-                      width: 10,
-                    ),
+                    SizedBox(width: 10),
 
                     Text(
-
                       'Modo administrador activado',
 
-                      style: TextStyle(
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
 
               // PUBLICAR ACTIVIDAD
               GestureDetector(
-
                 onTap: () {
-
                   Navigator.push(
-
                     context,
 
                     MaterialPageRoute(
-
-                      builder: (context) =>
-                          const PublicarActividad(),
+                      builder: (context) => const PublicarActividad(),
                     ),
                   );
                 },
 
                 child: _buildCard(
-
                   Icons.campaign,
 
                   'Publicar actividad',
@@ -270,29 +197,21 @@ class Home extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
 
               // GESTIONAR ACTIVIDADES
               GestureDetector(
-
                 onTap: () {
-
                   Navigator.push(
-
                     context,
 
                     MaterialPageRoute(
-
-                      builder: (context) =>
-                          const GestionarActividades(),
+                      builder: (context) => const GestionarActividades(),
                     ),
                   );
                 },
 
                 child: _buildCard(
-
                   Icons.list_alt,
 
                   'Gestionar actividades',
@@ -301,29 +220,21 @@ class Home extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
 
               // EVALUAR HORAS
               GestureDetector(
-
                 onTap: () {
-
                   Navigator.push(
-
                     context,
 
                     MaterialPageRoute(
-
-                      builder: (context) =>
-                          const EvaluarHoras(),
+                      builder: (context) => const EvaluarHoras(),
                     ),
                   );
                 },
 
                 child: _buildCard(
-
                   Icons.check_circle,
 
                   'Evaluar horas',
@@ -332,29 +243,21 @@ class Home extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
 
               // ADMINISTRAR USUARIOS
               GestureDetector(
-
                 onTap: () {
-
                   Navigator.push(
-
                     context,
 
                     MaterialPageRoute(
-
-                      builder: (context) =>
-                          const ProyeccionSocial(),
+                      builder: (context) => const ProyeccionSocial(),
                     ),
                   );
                 },
 
                 child: _buildCard(
-
                   Icons.groups,
 
                   'Administrar usuarios',
@@ -368,99 +271,58 @@ class Home extends StatelessWidget {
       ),
 
       // MENU INFERIOR
-      bottomNavigationBar:
-          BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: const Color(0xFF2E4A9E),
 
-        selectedItemColor:
-            const Color(0xFF2E4A9E),
-
-        unselectedItemColor:
-            Colors.grey,
+        unselectedItemColor: Colors.grey,
 
         currentIndex: 0,
 
         onTap: (index) {
-
           // ESTADISTICAS O MIS HORAS
           if (index == 1) {
-
             Navigator.pushReplacement(
-
               context,
 
               MaterialPageRoute(
-
-                builder: (context) =>
-
-                    rol == 'admin'
-
-                        ? const EstadisticasAdmin()
-
-                        : MisHoras(
-                            rol: rol,
-                          ),
+                builder: (context) => rol == 'admin'
+                    ? const EstadisticasAdmin()
+                    : MisHoras(rol: rol),
               ),
             );
           }
 
           // PERFIL
           if (index == 2) {
-
             Navigator.pushReplacement(
-
               context,
 
               MaterialPageRoute(
-
                 builder: (context) =>
-                    Perfil(
-
-                  rol: rol,
-
-                  nombre: nombre,
-
-                  correo: correo,
-                ),
+                    Perfil(rol: rol, nombre: nombre, correo: correo),
               ),
             );
           }
         },
 
         items: [
-
           // INICIO
           const BottomNavigationBarItem(
-
-            icon: Icon(
-              Icons.home,
-            ),
+            icon: Icon(Icons.home),
 
             label: 'Inicio',
           ),
 
           // ESTADISTICAS O HORAS
           BottomNavigationBarItem(
+            icon: Icon(rol == 'admin' ? Icons.bar_chart : Icons.access_time),
 
-            icon: Icon(
-
-              rol == 'admin'
-                  ? Icons.bar_chart
-                  : Icons.access_time,
-            ),
-
-            label:
-
-                rol == 'admin'
-                    ? 'Estadísticas'
-                    : 'Mis horas',
+            label: rol == 'admin' ? 'Estadísticas' : 'Mis horas',
           ),
 
           // PERFIL
           const BottomNavigationBarItem(
-
-            icon: Icon(
-              Icons.person,
-            ),
+            icon: Icon(Icons.person),
 
             label: 'Perfil',
           ),
@@ -470,130 +332,70 @@ class Home extends StatelessWidget {
   }
 
   // WIDGET CARD PRINCIPAL
-  Widget _buildCard(
-
-    IconData icon,
-
-    String title,
-
-    String subtitle,
-  ) {
-
+  Widget _buildCard(IconData icon, String title, String subtitle) {
     return Container(
-
-      padding:
-          const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
+        color: const Color(0xFF2E4A9E),
 
-        color:
-            const Color(0xFF2E4A9E),
-
-        borderRadius:
-            BorderRadius.circular(
-          22,
-        ),
+        borderRadius: BorderRadius.circular(22),
 
         boxShadow: [
-
           BoxShadow(
-
             color: Colors.black12,
 
             blurRadius: 6,
 
-            offset:
-                const Offset(
-              0,
-              4,
-            ),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
 
       child: Row(
-
         children: [
-
           // ICONO
           CircleAvatar(
-
             radius: 28,
 
-            backgroundColor:
-                Colors.white24,
+            backgroundColor: Colors.white24,
 
-            child: Icon(
-
-              icon,
-
-              color: Colors.yellow,
-
-              size: 28,
-            ),
+            child: Icon(icon, color: Colors.yellow, size: 28),
           ),
 
-          const SizedBox(
-            width: 18,
-          ),
+          const SizedBox(width: 18),
 
           // TEXTOS
           Expanded(
-
             child: Column(
-
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
-
                 Text(
-
                   title,
 
-                  style:
-                      const TextStyle(
-
+                  style: const TextStyle(
                     color: Colors.white,
 
-                    fontWeight:
-                        FontWeight.bold,
+                    fontWeight: FontWeight.bold,
 
                     fontSize: 18,
                   ),
                 ),
 
-                const SizedBox(
-                  height: 5,
-                ),
+                const SizedBox(height: 5),
 
                 Text(
-
                   subtitle,
 
-                  style:
-                      const TextStyle(
-
-                    color:
-                        Colors.white70,
-
-                    fontSize: 15,
-                  ),
+                  style: const TextStyle(color: Colors.white70, fontSize: 15),
                 ),
               ],
             ),
           ),
 
           // ICONO FLECHA
-          const Icon(
-
-            Icons.arrow_forward_ios,
-
-            color: Colors.white70,
-
-            size: 18,
-          ),
+          const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 18),
         ],
       ),
     );
