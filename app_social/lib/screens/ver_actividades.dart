@@ -124,11 +124,17 @@ class _VerActividadesState extends State<VerActividades> {
       // COLOR FONDO
       backgroundColor: const Color(0xFFF4F6FA),
 
-      // APPBAR
       appBar: AppBar(
         backgroundColor: const Color(0xFF2E4A9E),
 
-        title: const Text("Actividades"),
+        iconTheme: const IconThemeData(color: Colors.white),
+
+        title: const Text(
+          'Actividades',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+
+        centerTitle: true,
       ),
 
       body: Column(
