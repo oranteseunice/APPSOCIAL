@@ -9,22 +9,15 @@ import '../../widgets/card_actividad.dart';
 
 // PANTALLA GESTIONAR ACTIVIDADES
 class GestionarActividades extends StatefulWidget {
-
-  const GestionarActividades({
-    super.key,
-  });
+  const GestionarActividades({super.key});
 
   @override
-  State<GestionarActividades> createState() =>
-      _GestionarActividadesState();
+  State<GestionarActividades> createState() => _GestionarActividadesState();
 }
 
-class _GestionarActividadesState
-    extends State<GestionarActividades> {
-
+class _GestionarActividadesState extends State<GestionarActividades> {
   // INSTANCIA SUPABASE
-  final supabase =
-      Supabase.instance.client;
+  final supabase = Supabase.instance.client;
 
   // LISTA ORIGINAL
   List actividades = [];
@@ -33,15 +26,13 @@ class _GestionarActividadesState
   List actividadesFiltradas = [];
 
   // CONTROLADOR BUSCADOR
-  final buscarController =
-      TextEditingController();
+  final buscarController = TextEditingController();
 
   // CONTROL CARGA
   bool cargando = true;
 
   @override
   void initState() {
-
     super.initState();
 
     obtenerActividades();
@@ -49,178 +40,86 @@ class _GestionarActividadesState
 
   // OBTENER ACTIVIDADES
   Future<void> obtenerActividades() async {
-
     try {
-
-      final response = await supabase
-
-          .from('actividades')
-
-          .select();
+      final response = await supabase.from('actividades').select();
 
       setState(() {
-
         actividades = response;
 
-        actividadesFiltradas =
-            response;
+        actividadesFiltradas = response;
 
         cargando = false;
       });
-
     } catch (e) {
-
-      ScaffoldMessenger.of(context)
-
-          .showSnackBar(
-
-        SnackBar(
-
-          content: Text(
-            'Error: $e',
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
   // BUSCAR ACTIVIDAD
-  void buscarActividad(
-    String texto,
-  ) {
+  void buscarActividad(String texto) {
+    final resultado = actividades.where((actividad) {
+      final titulo = actividad['titulo'].toString().toLowerCase();
 
-    final resultado =
-        actividades.where((actividad) {
-
-      final titulo =
-          actividad['titulo']
-              .toString()
-              .toLowerCase();
-
-      return titulo.contains(
-        texto.toLowerCase(),
-      );
-
+      return titulo.contains(texto.toLowerCase());
     }).toList();
 
     setState(() {
-
-      actividadesFiltradas =
-          resultado;
+      actividadesFiltradas = resultado;
     });
   }
 
   // ELIMINAR ACTIVIDAD
-  Future<void> eliminarActividad(
-    int id,
-  ) async {
-
+  Future<void> eliminarActividad(int id) async {
     try {
-
-      await supabase
-
-          .from('actividades')
-
-          .delete()
-
-          .eq(
-            'id_actividad',
-            id,
-          );
+      await supabase.from('actividades').delete().eq('id_actividad', id);
 
       // RECARGAR ACTIVIDADES
       obtenerActividades();
 
-      ScaffoldMessenger.of(context)
-
-          .showSnackBar(
-
-        const SnackBar(
-
-          content: Text(
-            'Actividad eliminada',
-          ),
-        ),
-      );
-
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Actividad eliminada')));
     } catch (e) {
-
-      ScaffoldMessenger.of(context)
-
-          .showSnackBar(
-
-        SnackBar(
-
-          content: Text(
-            'Error: $e',
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
   // CONFIRMAR ELIMINACIÓN
-  void confirmarEliminar(
-    int id,
-  ) {
-
+  void confirmarEliminar(int id) {
     showDialog(
-
       context: context,
 
       builder: (context) {
-
         return AlertDialog(
+          title: const Text('Eliminar actividad'),
 
-          title: const Text(
-            'Eliminar actividad',
-          ),
-
-          content: const Text(
-            '¿Deseas eliminar esta actividad?',
-          ),
+          content: const Text('¿Deseas eliminar esta actividad?'),
 
           actions: [
-
             // CANCELAR
             TextButton(
-
               onPressed: () {
-
-                Navigator.pop(
-                  context,
-                );
+                Navigator.pop(context);
               },
 
-              child: const Text(
-                'Cancelar',
-              ),
+              child: const Text('Cancelar'),
             ),
 
             // ELIMINAR
             ElevatedButton(
-
-              style:
-                  ElevatedButton.styleFrom(
-
-                backgroundColor:
-                    Colors.red,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
 
               onPressed: () {
+                Navigator.pop(context);
 
-                Navigator.pop(
-                  context,
-                );
-
-                eliminarActividad(
-                  id,
-                );
+                eliminarActividad(id);
               },
 
-              child: const Text(
-                'Eliminar',
-              ),
+              child: const Text('Eliminar'),
             ),
           ],
         );
@@ -230,198 +129,120 @@ class _GestionarActividadesState
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       // COLOR FONDO
-      backgroundColor:
-          const Color(0xFFF4F6FA),
+      backgroundColor: const Color(0xFFF4F6FA),
 
-      // APPBAR
       appBar: AppBar(
+        backgroundColor: const Color(0xFF2E4A9E),
 
-        backgroundColor:
-            const Color(0xFF2E4A9E),
+        iconTheme: const IconThemeData(color: Colors.white),
 
         title: const Text(
           'Gestionar actividades',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
 
       body: Column(
-
         children: [
-
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 20),
 
           // BUSCADOR
           Padding(
-
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
 
             child: TextField(
+              controller: buscarController,
 
-              controller:
-                  buscarController,
-
-              onChanged:
-                  buscarActividad,
+              onChanged: buscarActividad,
 
               decoration: InputDecoration(
+                hintText: 'Buscar actividad',
 
-                hintText:
-                    'Buscar actividad',
-
-                prefixIcon:
-                    const Icon(
-                  Icons.search,
-                ),
+                prefixIcon: const Icon(Icons.search),
 
                 filled: true,
 
-                fillColor:
-                    Colors.white,
+                fillColor: Colors.white,
 
-                border:
-                    OutlineInputBorder(
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    15,
-                  ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
                 ),
               ),
             ),
           ),
 
-          const SizedBox(
-            height: 15,
-          ),
+          const SizedBox(height: 15),
 
           // LOADING
           cargando
-
               ? const Expanded(
-
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              // EMPTY STATE
+              : actividadesFiltradas.isEmpty
+              ? Expanded(
                   child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
 
-                    child:
-                        CircularProgressIndicator(),
+                      children: [
+                        Icon(
+                          Icons.event_busy,
+
+                          size: 90,
+
+                          color: Colors.grey.shade400,
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        Text(
+                          'No hay actividades',
+
+                          style: TextStyle(
+                            fontSize: 18,
+
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
+              // LISTA ACTIVIDADES
+              : Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(20),
 
-              // EMPTY STATE
-              : actividadesFiltradas
-                      .isEmpty
+                    itemCount: actividadesFiltradas.length,
 
-                  ? Expanded(
+                    itemBuilder: (context, index) {
+                      final actividad = actividadesFiltradas[index];
 
-                      child: Center(
+                      // CARD ACTIVIDAD
+                      return CardActividad(
+                        actividad: actividad,
 
-                        child: Column(
+                        onEditar: () {
+                          Navigator.push(
+                            context,
 
-                          mainAxisAlignment:
-                              MainAxisAlignment
-                                  .center,
-
-                          children: [
-
-                            Icon(
-
-                              Icons.event_busy,
-
-                              size: 90,
-
-                              color:
-                                  Colors.grey
-                                      .shade400,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  PublicarActividad(actividadEditar: actividad),
                             ),
-
-                            const SizedBox(
-                              height: 20,
-                            ),
-
-                            Text(
-
-                              'No hay actividades',
-
-                              style: TextStyle(
-
-                                fontSize: 18,
-
-                                color:
-                                    Colors.grey
-                                        .shade600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-
-                  // LISTA ACTIVIDADES
-                  : Expanded(
-
-                      child:
-                          ListView.builder(
-
-                        padding:
-                            const EdgeInsets.all(
-                          20,
-                        ),
-
-                        itemCount:
-                            actividadesFiltradas
-                                .length,
-
-                        itemBuilder:
-                            (context, index) {
-
-                          final actividad =
-                              actividadesFiltradas[
-                                  index];
-
-                          // CARD ACTIVIDAD
-                          return CardActividad(
-
-                            actividad:
-                                actividad,
-
-                            onEditar: () {
-
-                              Navigator.push(
-
-                                context,
-
-                                MaterialPageRoute(
-
-                                  builder: (_) =>
-                                      PublicarActividad(
-
-                                    actividadEditar:
-                                        actividad,
-                                  ),
-                                ),
-                              );
-                            },
-
-                            onEliminar: () {
-
-                              confirmarEliminar(
-
-                                actividad[
-                                    'id_actividad'],
-                              );
-                            },
                           );
                         },
-                      ),
-                    ),
+
+                        onEliminar: () {
+                          confirmarEliminar(actividad['id_actividad']);
+                        },
+                      );
+                    },
+                  ),
+                ),
         ],
       ),
     );

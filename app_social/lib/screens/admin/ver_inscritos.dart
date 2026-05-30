@@ -9,7 +9,6 @@ class VerInscritos extends StatefulWidget {
 }
 
 class _VerInscritosState extends State<VerInscritos> {
-
   final supabase = Supabase.instance.client;
 
   List inscritos = [];
@@ -23,127 +22,100 @@ class _VerInscritosState extends State<VerInscritos> {
   }
 
   Future<void> obtenerInscritos() async {
-
     try {
-
-      final data = await supabase
-          .from('inscritos')
-          .select();
+      final data = await supabase.from('inscritos').select();
 
       setState(() {
         inscritos = data;
         cargando = false;
       });
-
     } catch (e) {
-
       setState(() {
         cargando = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       backgroundColor: const Color(0xFFF4F6FA),
 
       appBar: AppBar(
         backgroundColor: const Color(0xFF2E4A9E),
-        title: const Text('Ver inscritos'),
+
+        iconTheme: const IconThemeData(color: Colors.white),
+
+        title: const Text(
+          'Ver inscritos',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
 
       body: cargando
-
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-
+          ? const Center(child: CircularProgressIndicator())
           : inscritos.isEmpty
+          ? const Center(child: Text('No hay inscritos'))
+          : ListView.builder(
+              padding: const EdgeInsets.all(20),
 
-              ? const Center(
-                  child: Text('No hay inscritos'),
-                )
+              itemCount: inscritos.length,
 
-              : ListView.builder(
+              itemBuilder: (context, index) {
+                final inscrito = inscritos[index];
 
-                  padding: const EdgeInsets.all(20),
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 15),
 
-                  itemCount: inscritos.length,
+                  padding: const EdgeInsets.all(16),
 
-                  itemBuilder: (context, index) {
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
 
-                    final inscrito = inscritos[index];
-
-                    return Container(
-
-                      margin: const EdgeInsets.only(bottom: 15),
-
-                      padding: const EdgeInsets.all(16),
-
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        backgroundColor: Color(0xFF2E4A9E),
+                        child: Icon(Icons.person, color: Colors.white),
                       ),
 
-                      child: Row(
-                        children: [
+                      const SizedBox(width: 16),
 
-                          const CircleAvatar(
-                            backgroundColor: Color(0xFF2E4A9E),
-                            child: Icon(
-                              Icons.person,
-                              color: Colors.white,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                          children: [
+                            Text(
+                              inscrito['nombre'] ?? '',
+
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
-                          ),
 
-                          const SizedBox(width: 16),
+                            const SizedBox(height: 5),
 
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                            Text(inscrito['actividad'] ?? ''),
 
-                              children: [
+                            const SizedBox(height: 5),
 
-                                Text(
-                                  inscrito['nombre'] ?? '',
-
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-
-                                const SizedBox(height: 5),
-
-                                Text(
-                                  inscrito['actividad'] ?? '',
-                                ),
-
-                                const SizedBox(height: 5),
-
-                                Text(
-                                  "Horas: ${inscrito['horas']}",
-                                ),
-
-                              ],
-                            ),
-                          ),
-
-                        ],
+                            Text("Horas: ${inscrito['horas']}"),
+                          ],
+                        ),
                       ),
-                    );
-                  },
-                ),
+                    ],
+                  ),
+                );
+              },
+            ),
     );
   }
 }

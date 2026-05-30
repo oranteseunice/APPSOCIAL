@@ -59,7 +59,7 @@ class CardDashboard extends StatelessWidget {
 
               child: Icon(
                 icono,
-                color: color,
+                color: const Color.fromARGB(255, 171, 122, 7),
                 size: 30,
               ),
             ),

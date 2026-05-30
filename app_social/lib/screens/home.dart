@@ -20,6 +20,7 @@ class Home extends StatelessWidget {
   final String rol;
   final String nombre;
   final String correo;
+  final int? idUsuario;
 
   const Home({
     super.key,
@@ -27,6 +28,7 @@ class Home extends StatelessWidget {
     required this.rol,
     required this.nombre,
     required this.correo,
+    this.idUsuario,
   });
 
   @override
@@ -45,7 +47,7 @@ class Home extends StatelessWidget {
           'Bienvenido $nombre',
 
           style: GoogleFonts.poppins(
-            color: const Color(0xFFFFC107),
+            color: const Color.fromARGB(255, 245, 244, 244),
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -84,7 +86,7 @@ class Home extends StatelessWidget {
                     context,
 
                     MaterialPageRoute(
-                      builder: (context) => VerActividades(rol: rol),
+                      builder: (context) => VerActividades(rol: rol, idUsuario: idUsuario),
                     ),
                   );
                 },
@@ -360,7 +362,7 @@ class Home extends StatelessWidget {
 
             backgroundColor: Colors.white24,
 
-            child: Icon(icon, color: Colors.yellow, size: 28),
+            child: Icon(icon, color: const Color.fromARGB(255, 255, 193, 7), size: 28),
           ),
 
           const SizedBox(width: 18),

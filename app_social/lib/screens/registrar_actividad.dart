@@ -363,7 +363,7 @@ class _RegistrarActividadState
                 builder: (context) => Home(
                   rol: widget.rol,
                   nombre: 'Usuario',
-                  correo: '',
+                  correo: ''
                 ),
               ),
             );

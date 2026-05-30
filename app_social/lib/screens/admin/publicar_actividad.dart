@@ -2,208 +2,138 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PublicarActividad extends StatefulWidget {
-
   final Map? actividadEditar;
 
-  const PublicarActividad({
-    super.key,
-    this.actividadEditar,
-  });
+  const PublicarActividad({super.key, this.actividadEditar});
 
   @override
-  State<PublicarActividad> createState() =>
-      _PublicarActividadState();
+  State<PublicarActividad> createState() => _PublicarActividadState();
 }
 
-class _PublicarActividadState
-    extends State<PublicarActividad> {
-
+class _PublicarActividadState extends State<PublicarActividad> {
   final supabase = Supabase.instance.client;
 
   final tituloController = TextEditingController();
-  final descripcionController =
-      TextEditingController();
+  final descripcionController = TextEditingController();
   final horasController = TextEditingController();
-  final categoriaController =
-      TextEditingController();
+  final categoriaController = TextEditingController();
 
   @override
   void initState() {
-
     super.initState();
 
     // SI ESTAMOS EDITANDO
     if (widget.actividadEditar != null) {
+      tituloController.text = widget.actividadEditar!['titulo'];
 
-      tituloController.text =
-          widget.actividadEditar!['titulo'];
+      descripcionController.text = widget.actividadEditar!['descripcion'];
 
-      descripcionController.text =
-          widget.actividadEditar!['descripcion'];
+      horasController.text = widget.actividadEditar!['horas_maximas']
+          .toString();
 
-      horasController.text =
-          widget.actividadEditar!['horas_maximas']
-              .toString();
-
-      categoriaController.text =
-          widget.actividadEditar!['categoria'];
+      categoriaController.text = widget.actividadEditar!['categoria'];
     }
   }
 
   Future<void> publicarActividad() async {
-
-    if (
-      tituloController.text.isEmpty ||
-      descripcionController.text.isEmpty ||
-      horasController.text.isEmpty ||
-      categoriaController.text.isEmpty
-    ) {
-
+    if (tituloController.text.isEmpty ||
+        descripcionController.text.isEmpty ||
+        horasController.text.isEmpty ||
+        categoriaController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-
-        const SnackBar(
-          content: Text(
-            'Completa todos los campos',
-          ),
-        ),
+        const SnackBar(content: Text('Completa todos los campos')),
       );
 
       return;
     }
 
     try {
-
       // CREAR ACTIVIDAD
       if (widget.actividadEditar == null) {
+        await supabase.from('actividades').insert({
+          'titulo': tituloController.text.trim(),
 
-        await supabase
-            .from('actividades')
-            .insert({
+          'descripcion': descripcionController.text.trim(),
 
-          'titulo':
-              tituloController.text.trim(),
+          'horas_maximas': int.parse(horasController.text.trim()),
 
-          'descripcion':
-              descripcionController.text.trim(),
-
-          'horas_maximas': int.parse(
-            horasController.text.trim(),
-          ),
-
-          'categoria':
-              categoriaController.text.trim(),
+          'categoria': categoriaController.text.trim(),
 
           'creador': 'Administrador',
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-
-          const SnackBar(
-            content: Text(
-              'Actividad publicada correctamente',
-            ),
-          ),
+          const SnackBar(content: Text('Actividad publicada correctamente')),
         );
-
       } else {
-
         // EDITAR ACTIVIDAD
         await supabase
             .from('actividades')
             .update({
+              'titulo': tituloController.text.trim(),
 
-          'titulo':
-              tituloController.text.trim(),
+              'descripcion': descripcionController.text.trim(),
 
-          'descripcion':
-              descripcionController.text.trim(),
+              'horas_maximas': int.parse(horasController.text.trim()),
 
-          'horas_maximas': int.parse(
-            horasController.text.trim(),
-          ),
-
-          'categoria':
-              categoriaController.text.trim(),
-        })
-
-            .eq(
-              'id_actividad',
-
-              widget.actividadEditar![
-                  'id_actividad'],
-            );
+              'categoria': categoriaController.text.trim(),
+            })
+            .eq('id_actividad', widget.actividadEditar!['id_actividad']);
 
         ScaffoldMessenger.of(context).showSnackBar(
-
-          const SnackBar(
-            content: Text(
-              'Actividad actualizada correctamente',
-            ),
-          ),
+          const SnackBar(content: Text('Actividad actualizada correctamente')),
         );
       }
 
       Navigator.pop(context);
-
     } catch (e) {
-
-      ScaffoldMessenger.of(context).showSnackBar(
-
-        SnackBar(
-          content: Text('Error: $e'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       backgroundColor: const Color(0xFFF4F6FA),
 
       appBar: AppBar(
+        backgroundColor: const Color(0xFF2E4A9E),
 
-        backgroundColor:
-            const Color(0xFF2E4A9E),
+        iconTheme: const IconThemeData(color: Colors.white),
 
         title: Text(
-
           widget.actividadEditar == null
-
               ? 'Publicar actividad'
-
               : 'Editar actividad',
+
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
 
       body: SingleChildScrollView(
-
         padding: const EdgeInsets.all(20),
 
         child: Column(
-
           children: [
-
             const SizedBox(height: 20),
 
             // TITULO
             TextField(
-
               controller: tituloController,
 
               decoration: InputDecoration(
-
                 labelText: 'Título',
 
                 filled: true,
                 fillColor: Colors.white,
 
                 border: OutlineInputBorder(
-
-                  borderRadius:
-                      BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(15),
                 ),
               ),
             ),
@@ -212,23 +142,18 @@ class _PublicarActividadState
 
             // DESCRIPCION
             TextField(
-
-              controller:
-                  descripcionController,
+              controller: descripcionController,
 
               maxLines: 4,
 
               decoration: InputDecoration(
-
                 labelText: 'Descripción',
 
                 filled: true,
                 fillColor: Colors.white,
 
                 border: OutlineInputBorder(
-
-                  borderRadius:
-                      BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(15),
                 ),
               ),
             ),
@@ -237,23 +162,18 @@ class _PublicarActividadState
 
             // HORAS
             TextField(
-
               controller: horasController,
 
-              keyboardType:
-                  TextInputType.number,
+              keyboardType: TextInputType.number,
 
               decoration: InputDecoration(
-
                 labelText: 'Horas máximas',
 
                 filled: true,
                 fillColor: Colors.white,
 
                 border: OutlineInputBorder(
-
-                  borderRadius:
-                      BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(15),
                 ),
               ),
             ),
@@ -262,24 +182,18 @@ class _PublicarActividadState
 
             // CATEGORIA
             TextField(
-
-              controller:
-                  categoriaController,
+              controller: categoriaController,
 
               decoration: InputDecoration(
-
                 labelText: 'Categoría',
 
-                hintText:
-                    'Social, ecológica, educativa...',
+                hintText: 'Social, ecológica, educativa...',
 
                 filled: true,
                 fillColor: Colors.white,
 
                 border: OutlineInputBorder(
-
-                  borderRadius:
-                      BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(15),
                 ),
               ),
             ),
@@ -288,40 +202,25 @@ class _PublicarActividadState
 
             // BOTON
             SizedBox(
-
               width: double.infinity,
 
               child: ElevatedButton(
-
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2E4A9E),
 
-                  backgroundColor:
-                      const Color(0xFF2E4A9E),
+                  foregroundColor: Colors.white,
 
-                  foregroundColor:
-                      Colors.white,
-
-                  padding:
-                      const EdgeInsets.symmetric(
-                    vertical: 16,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
 
                   shape: RoundedRectangleBorder(
-
-                    borderRadius:
-                        BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                 ),
 
                 onPressed: publicarActividad,
 
                 child: Text(
-
-                  widget.actividadEditar == null
-
-                      ? 'Publicar'
-
-                      : 'Actualizar',
+                  widget.actividadEditar == null ? 'Publicar' : 'Actualizar',
 
                   style: const TextStyle(
                     fontSize: 16,

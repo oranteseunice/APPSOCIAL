@@ -21,15 +21,11 @@ class EstadisticasAdmin extends StatefulWidget {
   const EstadisticasAdmin({super.key});
 
   @override
-  State<EstadisticasAdmin> createState() =>
-      _EstadisticasAdminState();
+  State<EstadisticasAdmin> createState() => _EstadisticasAdminState();
 }
 
-class _EstadisticasAdminState
-    extends State<EstadisticasAdmin> {
-
-  final supabase =
-      Supabase.instance.client;
+class _EstadisticasAdminState extends State<EstadisticasAdmin> {
+  final supabase = Supabase.instance.client;
 
   // VARIABLES
 
@@ -54,190 +50,107 @@ class _EstadisticasAdminState
   // CARGAR ESTADISTICAS
 
   Future<void> cargarEstadisticas() async {
-
     try {
-
       // INSCRITOS
-      final inscritosDB =
-          await supabase
-              .from('inscritos')
-              .select();
+      final inscritosDB = await supabase.from('inscritos').select();
 
       // ACTIVIDADES
-      final actividadesDB =
-          await supabase
-              .from('actividades')
-              .select();
+      final actividadesDB = await supabase.from('actividades').select();
 
       // APROBADAS
-      final aprobadasDB =
-          await supabase
-              .from('evidencias')
-              .select()
-              .eq(
-                'estado',
-                'aprobado',
-              );
+      final aprobadasDB = await supabase
+          .from('evidencias')
+          .select()
+          .eq('estado', 'aprobado');
 
       // PENDIENTES
-      final pendientesDB =
-          await supabase
-              .from('evidencias')
-              .select()
-              .eq(
-                'estado',
-                'pendiente',
-              );
+      final pendientesDB = await supabase
+          .from('evidencias')
+          .select()
+          .eq('estado', 'pendiente');
 
       // TOTAL EVIDENCIAS
-      int total =
-
-          (aprobadasDB as List)
-              .length +
-
-          (pendientesDB as List)
-              .length;
+      int total = (aprobadasDB as List).length + (pendientesDB as List).length;
 
       // PORCENTAJE
-      porcentajeAprobado =
-          total == 0
-              ? 0
-              : (aprobadasDB as List)
-                      .length /
-                  total;
+      porcentajeAprobado = total == 0
+          ? 0
+          : (aprobadasDB as List).length / total;
 
       // ACTUALIZAR UI
       setState(() {
+        totalInscritos = inscritosDB.length;
 
-        totalInscritos =
-            inscritosDB.length;
+        totalActividades = actividadesDB.length;
 
-        totalActividades =
-            actividadesDB.length;
+        aprobadas = aprobadasDB.length;
 
-        aprobadas =
-            aprobadasDB.length;
-
-        pendientes =
-            pendientesDB.length;
+        pendientes = pendientesDB.length;
 
         cargando = false;
       });
-
     } catch (e) {
-
       setState(() {
         cargando = false;
       });
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(
-
-        SnackBar(
-          content:
-              Text('Error: $e'),
-        ),
-      );
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
   // ABRIR PANTALLAS
 
-  void abrirPantalla(
-    Widget pantalla,
-  ) {
-
-    Navigator.push(
-
-      context,
-
-      MaterialPageRoute(
-        builder: (_) =>
-            pantalla,
-      ),
-    );
+  void abrirPantalla(Widget pantalla) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => pantalla));
   }
 
   // BUILD
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      backgroundColor:
-          const Color(
-        0xFFF4F6FA,
-      ),
+      backgroundColor: const Color(0xFFF4F6FA),
 
       // APPBAR
-
       appBar: AppBar(
+        backgroundColor: const Color(0xFF2E4A9E),
 
-        backgroundColor:
-            const Color(
-          0xFF2E4A9E,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
 
         title: const Text(
           'Estadísticas',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
 
         centerTitle: true,
       ),
 
       // BODY
-
       body: cargando
-
-          ? const Center(
-              child:
-                  CircularProgressIndicator(),
-            )
-
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-
-              padding:
-                  const EdgeInsets.all(
-                20,
-              ),
+              padding: const EdgeInsets.all(20),
 
               child: Column(
-
-                crossAxisAlignment:
-                    CrossAxisAlignment
-                        .start,
+                crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-
                   // TITULO
-
                   const Text(
-
                     'Resumen general',
 
-                    style: TextStyle(
-
-                      fontSize: 20,
-
-                      fontWeight:
-                          FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
 
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
 
                   // GRID ESTADISTICAS
-
                   GridView.count(
-
                     shrinkWrap: true,
 
-                    physics:
-                        const NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
 
                     crossAxisCount: 2,
 
@@ -248,292 +161,172 @@ class _EstadisticasAdminState
                     childAspectRatio: 1.1,
 
                     children: [
-
                       // INSCRITOS
                       CardEstadistica(
+                        icon: Icons.people,
 
-                        icon:
-                            Icons.people,
+                        titulo: 'Inscritos',
 
-                        titulo:
-                            'Inscritos',
-
-                        valor:
-                            '$totalInscritos',
+                        valor: '$totalInscritos',
 
                         onTap: () {
-
-                          abrirPantalla(
-                            const VerInscritos(),
-                          );
+                          abrirPantalla(const VerInscritos());
                         },
                       ),
 
                       // ACTIVIDADES
                       CardEstadistica(
+                        icon: Icons.assignment,
 
-                        icon: Icons
-                            .assignment,
+                        titulo: 'Actividades',
 
-                        titulo:
-                            'Actividades',
-
-                        valor:
-                            '$totalActividades',
+                        valor: '$totalActividades',
 
                         onTap: () {
-
-                          abrirPantalla(
-                            const ProyeccionSocial(),
-                          );
+                          abrirPantalla(const ProyeccionSocial());
                         },
                       ),
 
                       // APROBADAS
                       CardEstadistica(
+                        icon: Icons.check_circle,
 
-                        icon: Icons
-                            .check_circle,
+                        titulo: 'Aprobadas',
 
-                        titulo:
-                            'Aprobadas',
-
-                        valor:
-                            '$aprobadas',
+                        valor: '$aprobadas',
 
                         onTap: () {
-
-                          abrirPantalla(
-                            const EvaluarHoras(),
-                          );
+                          abrirPantalla(const EvaluarHoras());
                         },
                       ),
 
                       // PENDIENTES
                       CardEstadistica(
+                        icon: Icons.pending,
 
-                        icon:
-                            Icons.pending,
+                        titulo: 'Pendientes',
 
-                        titulo:
-                            'Pendientes',
-
-                        valor:
-                            '$pendientes',
+                        valor: '$pendientes',
 
                         onTap: () {
-
-                          abrirPantalla(
-                            const EvaluarHoras(),
-                          );
+                          abrirPantalla(const EvaluarHoras());
                         },
                       ),
                     ],
                   ),
 
-                  const SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 30),
 
                   // PROGRESO
-
                   Container(
+                    padding: const EdgeInsets.all(20),
 
-                    padding:
-                        const EdgeInsets
-                            .all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
 
-                    decoration:
-                        BoxDecoration(
-
-                      color:
-                          Colors.white,
-
-                      borderRadius:
-                          BorderRadius
-                              .circular(
-                        20,
-                      ),
+                      borderRadius: BorderRadius.circular(20),
 
                       boxShadow: [
-
                         BoxShadow(
+                          color: Colors.black12,
 
-                          color: Colors
-                              .black12,
+                          blurRadius: 6,
 
-                          blurRadius:
-                              6,
-
-                          offset:
-                              const Offset(
-                            0,
-                            4,
-                          ),
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
 
                     child: Column(
-
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
 
                       children: [
-
                         const Text(
-
                           'Progreso de aprobación',
 
-                          style:
-                              TextStyle(
+                          style: TextStyle(
+                            fontSize: 20,
 
-                            fontSize:
-                                20,
-
-                            fontWeight:
-                                FontWeight
-                                    .bold,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
 
-                        const SizedBox(
-                          height: 20,
-                        ),
+                        const SizedBox(height: 20),
 
                         LinearProgressIndicator(
+                          value: porcentajeAprobado,
 
-                          value:
-                              porcentajeAprobado,
+                          minHeight: 14,
 
-                          minHeight:
-                              14,
+                          borderRadius: BorderRadius.circular(20),
 
-                          borderRadius:
-                              BorderRadius
-                                  .circular(
-                            20,
-                          ),
+                          backgroundColor: Colors.grey.shade300,
 
-                          backgroundColor:
-                              Colors.grey
-                                  .shade300,
-
-                          color:
-                              const Color(
-                            0xFF2E4A9E,
-                          ),
+                          color: const Color(0xFF2E4A9E),
                         ),
 
-                        const SizedBox(
-                          height: 15,
-                        ),
+                        const SizedBox(height: 15),
 
                         Text(
-
                           '${(porcentajeAprobado * 100).toStringAsFixed(0)}% de evidencias aprobadas',
 
-                          style:
-                              const TextStyle(
-
-                            fontWeight:
-                                FontWeight
-                                    .w500,
-                          ),
+                          style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 30),
 
                   // PANEL ADMIN
-
                   const Text(
-
                     'Panel administrativo',
 
-                    style: TextStyle(
-
-                      fontSize: 20,
-
-                      fontWeight:
-                          FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
 
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
 
                   // PUBLICAR ACTIVIDAD
                   _buildAccion(
+                    icon: Icons.add_box,
 
-                    icon:
-                        Icons.add_box,
+                    titulo: 'Publicar actividad',
 
-                    titulo:
-                        'Publicar actividad',
-
-                    subtitulo:
-                        'Crear nuevas actividades',
+                    subtitulo: 'Crear nuevas actividades',
 
                     onTap: () {
-
-                      abrirPantalla(
-                        const PublicarActividad(),
-                      );
+                      abrirPantalla(const PublicarActividad());
                     },
                   ),
 
-                  const SizedBox(
-                    height: 15,
-                  ),
+                  const SizedBox(height: 15),
 
                   // EVALUAR
                   _buildAccion(
+                    icon: Icons.fact_check,
 
-                    icon: Icons
-                        .fact_check,
+                    titulo: 'Evaluar evidencias',
 
-                    titulo:
-                        'Evaluar evidencias',
-
-                    subtitulo:
-                        'Aprobar o rechazar horas',
+                    subtitulo: 'Aprobar o rechazar horas',
 
                     onTap: () {
-
-                      abrirPantalla(
-                        const EvaluarHoras(),
-                      );
+                      abrirPantalla(const EvaluarHoras());
                     },
                   ),
 
-                  const SizedBox(
-                    height: 15,
-                  ),
+                  const SizedBox(height: 15),
 
                   // PROYECCION
                   _buildAccion(
+                    icon: Icons.school,
 
-                    icon:
-                        Icons.school,
+                    titulo: 'Proyección social',
 
-                    titulo:
-                        'Proyección social',
-
-                    subtitulo:
-                        'Gestionar actividades sociales',
+                    subtitulo: 'Gestionar actividades sociales',
 
                     onTap: () {
-
-                      abrirPantalla(
-                        const ProyeccionSocial(),
-                      );
+                      abrirPantalla(const ProyeccionSocial());
                     },
                   ),
                 ],
@@ -541,69 +334,36 @@ class _EstadisticasAdminState
             ),
 
       // MENU INFERIOR
-
-      bottomNavigationBar:
-          BottomNavigationBar(
-
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1,
 
-        selectedItemColor:
-            const Color(
-          0xFF2E4A9E,
-        ),
+        selectedItemColor: const Color(0xFF2E4A9E),
 
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
 
           BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
 
-            icon: Icon(
-              Icons.home,
-            ),
-
-            label: 'Inicio',
+            label: 'Estadísticas',
           ),
 
-          BottomNavigationBarItem(
-
-            icon: Icon(
-              Icons.bar_chart,
-            ),
-
-            label:
-                'Estadísticas',
-          ),
-
-          BottomNavigationBarItem(
-
-            icon: Icon(
-              Icons.person,
-            ),
-
-            label: 'Perfil',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
 
         onTap: (index) {
-
           // INICIO
           if (index == 0) {
-
             Navigator.pushReplacement(
-
               context,
 
               MaterialPageRoute(
-
-                builder: (_) =>
-                    Home(
-
+                builder: (_) => Home(
                   rol: 'admin',
 
-                  nombre:
-                      'Admin',
+                  nombre: 'Admin',
 
-                  correo:
-                      'admin@gmail.com',
+                  correo: 'admin@gmail.com',
                 ),
               ),
             );
@@ -611,23 +371,16 @@ class _EstadisticasAdminState
 
           // PERFIL
           if (index == 2) {
-
             Navigator.pushReplacement(
-
               context,
 
               MaterialPageRoute(
-
-                builder: (_) =>
-                    Perfil(
-
+                builder: (_) => Perfil(
                   rol: 'admin',
 
-                  nombre:
-                      'Admin',
+                  nombre: 'Admin',
 
-                  correo:
-                      'admin@gmail.com',
+                  correo: 'admin@gmail.com',
                 ),
               ),
             );
@@ -640,7 +393,6 @@ class _EstadisticasAdminState
   // CARD ACCIONES
 
   Widget _buildAccion({
-
     required IconData icon,
 
     required String titulo,
@@ -649,109 +401,60 @@ class _EstadisticasAdminState
 
     required VoidCallback onTap,
   }) {
-
     return GestureDetector(
-
       onTap: onTap,
 
       child: Container(
+        padding: const EdgeInsets.all(18),
 
-        padding:
-            const EdgeInsets.all(
-          18,
-        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2E4A9E),
 
-        decoration:
-            BoxDecoration(
-
-          color:
-              const Color(
-            0xFF2E4A9E,
-          ),
-
-          borderRadius:
-              BorderRadius.circular(
-            18,
-          ),
+          borderRadius: BorderRadius.circular(18),
         ),
 
         child: Row(
-
           children: [
-
             CircleAvatar(
+              backgroundColor: Colors.white24,
 
-              backgroundColor:
-                  Colors.white24,
-
-              child: Icon(
-
-                icon,
-
-                color:
-                    const Color(
-                  0xFFFFC107,
-                ),
-              ),
+              child: Icon(icon, color: const Color(0xFFFFC107)),
             ),
 
-            const SizedBox(
-              width: 15,
-            ),
+            const SizedBox(width: 15),
 
             Expanded(
-
               child: Column(
-
-                crossAxisAlignment:
-                    CrossAxisAlignment
-                        .start,
+                crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-
                   Text(
-
                     titulo,
 
-                    style:
-                        const TextStyle(
+                    style: const TextStyle(
+                      color: Colors.white,
 
-                      color:
-                          Colors.white,
-
-                      fontWeight:
-                          FontWeight.bold,
+                      fontWeight: FontWeight.bold,
 
                       fontSize: 16,
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 4,
-                  ),
+                  const SizedBox(height: 4),
 
                   Text(
-
                     subtitulo,
 
-                    style:
-                        const TextStyle(
-
-                      color:
-                          Colors.white70,
-                    ),
+                    style: const TextStyle(color: Colors.white70),
                   ),
                 ],
               ),
             ),
 
             const Icon(
+              Icons.arrow_forward_ios,
 
-              Icons
-                  .arrow_forward_ios,
-
-              color:
-                  Colors.white70,
+              color: Colors.white70,
 
               size: 18,
             ),

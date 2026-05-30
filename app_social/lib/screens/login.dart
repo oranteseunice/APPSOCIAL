@@ -9,7 +9,6 @@ import 'home.dart';
 
 // PANTALLA LOGIN
 class Login extends StatefulWidget {
-
   const Login({super.key});
 
   @override
@@ -17,7 +16,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-
   // CONTROLADORES DE LOS INPUTS
   final correoController = TextEditingController();
   final passwordController = TextEditingController();
@@ -28,7 +26,6 @@ class _LoginState extends State<Login> {
   // LIBERAR MEMORIA
   @override
   void dispose() {
-
     correoController.dispose();
     passwordController.dispose();
 
@@ -37,7 +34,6 @@ class _LoginState extends State<Login> {
 
   // MÉTODO LOGIN
   Future<void> iniciarSesion() async {
-
     // EVITA MULTIPLES CLICKS
     if (cargando) return;
 
@@ -50,24 +46,14 @@ class _LoginState extends State<Login> {
     final supabase = Supabase.instance.client;
 
     // OBTENER DATOS INPUTS
-    final correo =
-        correoController.text
-            .trim()
-            .toLowerCase();
+    final correo = correoController.text.trim().toLowerCase();
 
-    final password =
-        passwordController.text.trim();
+    final password = passwordController.text.trim();
 
     // VALIDAR CAMPOS VACÍOS
     if (correo.isEmpty || password.isEmpty) {
-
       ScaffoldMessenger.of(context).showSnackBar(
-
-        const SnackBar(
-          content: Text(
-            'Completa todos los campos',
-          ),
-        ),
+        const SnackBar(content: Text('Completa todos los campos')),
       );
 
       setState(() {
@@ -78,13 +64,8 @@ class _LoginState extends State<Login> {
     }
 
     try {
-
       // LOGIN REAL SUPABASE AUTH
-      await supabase.auth.signInWithPassword(
-
-        email: correo,
-        password: password,
-      );
+      await supabase.auth.signInWithPassword(email: correo, password: password);
 
       // BUSCAR DATOS EN TABLA USUARIOS
       final user = await supabase
@@ -95,16 +76,9 @@ class _LoginState extends State<Login> {
 
       // VALIDAR SI EXISTE
       if (user == null) {
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-
-          const SnackBar(
-            content: Text(
-              'Usuario no encontrado',
-            ),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Usuario no encontrado')));
 
         setState(() {
           cargando = false;
@@ -114,60 +88,35 @@ class _LoginState extends State<Login> {
       }
 
       // DATOS USUARIO
-      final rol =
-          user['rol'] ?? 'estudiante';
+      final rol = user['rol'] ?? 'estudiante';
 
-      final nombre =
-          user['nombre'] ?? 'Usuario';
+      final nombre = user['nombre'] ?? 'Usuario';
 
-      final correoDB =
-          user['correo'] ?? '';
+      final correoDB = user['correo'] ?? '';
+
+      final idUsuario = user['id_usuario'];
 
       // DEBUG
       print("USER: $user");
 
       // NAVEGAR HOME
       Navigator.pushReplacement(
-
         context,
 
         MaterialPageRoute(
-
-          builder: (context) => Home(
-
-            rol: rol,
-            nombre: nombre,
-            correo: correoDB,
-          ),
+          builder: (context) =>
+              Home(rol: rol, nombre: nombre, correo: correoDB, idUsuario: idUsuario,),
         ),
       );
-
     } on AuthException catch (e) {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        SnackBar(
-          content: Text(
-            e.message,
-          ),
-        ),
-      );
-
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        SnackBar(
-          content: Text(
-            'Error: $e',
-          ),
-        ),
-      );
-
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
-
       // DESACTIVAR LOADING
       setState(() {
         cargando = false;
@@ -177,30 +126,20 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       // COLOR FONDO
       backgroundColor: const Color(0xFFF5F6F8),
 
       body: ListView(
-
-        padding:
-            const EdgeInsets.symmetric(
-          horizontal: 20,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
 
         children: [
-
           const SizedBox(height: 40),
 
           // LOGO REDONDO
           Center(
-
             child: ClipOval(
-
               child: Image.asset(
-
                 'assets/logo.jpeg',
 
                 width: 220,
@@ -215,23 +154,16 @@ class _LoginState extends State<Login> {
 
           // TÍTULO
           const Text(
-
             'UCAD Servicio Social',
 
             textAlign: TextAlign.center,
 
             style: TextStyle(
-
               fontSize: 26,
 
               fontWeight: FontWeight.bold,
 
-              color: Color.fromARGB(
-                255,
-                30,
-                58,
-                138,
-              ),
+              color: Color.fromARGB(255, 30, 58, 138),
             ),
           ),
 
@@ -239,29 +171,19 @@ class _LoginState extends State<Login> {
 
           // INPUT CORREO
           TextField(
-
             controller: correoController,
 
             decoration: InputDecoration(
+              hintText: 'Correo electrónico',
 
-              hintText:
-                  'Correo electrónico',
-
-              prefixIcon: const Icon(
-
-                Icons.email,
-
-                color: Color(0xFFF0B429),
-              ),
+              prefixIcon: const Icon(Icons.email, color: Color(0xFFF0B429)),
 
               filled: true,
 
               fillColor: Colors.white,
 
               border: OutlineInputBorder(
-
-                borderRadius:
-                    BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
@@ -270,42 +192,30 @@ class _LoginState extends State<Login> {
 
           // LABEL PASSWORD
           const Text(
-
             'Contraseña',
 
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontWeight: FontWeight.w600),
           ),
 
           const SizedBox(height: 8),
 
           // INPUT PASSWORD
           TextField(
-
             controller: passwordController,
 
             obscureText: true,
 
             decoration: InputDecoration(
-
               hintText: 'Contraseña',
 
-              prefixIcon: const Icon(
-
-                Icons.lock,
-
-                color: Color(0xFFF0B429),
-              ),
+              prefixIcon: const Icon(Icons.lock, color: Color(0xFFF0B429)),
 
               filled: true,
 
               fillColor: Colors.white,
 
               border: OutlineInputBorder(
-
-                borderRadius:
-                    BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
@@ -314,14 +224,8 @@ class _LoginState extends State<Login> {
 
           // MOSTRAR LOADER O BOTÓN
           cargando
-
-              ? const Center(
-                  child:
-                      CircularProgressIndicator(),
-                )
-
+              ? const Center(child: CircularProgressIndicator())
               : BotonPrincipal(
-
                   texto: 'Iniciar sesión',
 
                   onPressed: iniciarSesion,
